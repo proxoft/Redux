@@ -9,20 +9,22 @@ namespace Proxoft.Redux.Hosting.Builders
     {
         IReducerBuilder<TState> UseDefaultDispatcher();
         IReducerBuilder<TState> UseDefaultDispatcher(IScheduler scheduler);
-        IReducerBuilder<TState> UseDispatcher(IActionDispatcher actionDispatcher);
+        IReducerBuilder<TState> UseDispatcher<TActionDispatcher>() where TActionDispatcher : IActionDispatcher;
+        IReducerBuilder<TState> UseDispatcher<TActionDispatcher>(TActionDispatcher actionDispatcher) where TActionDispatcher : IActionDispatcher;
     }
 
     public interface IReducerBuilder<TState>
     {
         IStateStreamBuilder<TState> UseReducerFunc(Func<TState, IAction, TState> func);
         IStateStreamBuilder<TState> UseReducer(IReducer<TState> reducer);
+        IStateStreamBuilder<TState> UseReducer<TReducer>() where TReducer: IReducer<TState>;
     }
 
     public interface IStateStreamBuilder<TState>
     {
         IEffectsBuilder<TState> UseDefaultStateStream();
         IEffectsBuilder<TState> UseDefaultStateStream(IScheduler scheduler);
-        IEffectsBuilder<TState> UseStateStream(IStateStreamSubject<TState> stateStreamSubject);
+        IEffectsBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream: IStateStreamSubject<TState>;
     }
 
     public interface IEffectsBuilder<TState>

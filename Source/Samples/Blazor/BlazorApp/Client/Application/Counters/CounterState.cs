@@ -2,6 +2,6 @@
 {
     public record CounterState
     {
-        public int Value { get; set; }
+        public int Value { get; init; }
     }
 }

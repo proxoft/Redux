@@ -22,9 +22,9 @@ namespace BlazorApp.Client
 
             builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services
-                .UseRedux<ApplicationState>()
+                .UseRedux<ApplicationState>(ServiceLifetime.Scoped)
                 .UseDefaultDispatcher()
-                .UseReducer(new ApplicationReducer())
+                .UseReducer<ApplicationReducer>()
                 .UseDefaultStateStream()
                 .AddEffects(Assembly.GetExecutingAssembly())
                 .Prepare()

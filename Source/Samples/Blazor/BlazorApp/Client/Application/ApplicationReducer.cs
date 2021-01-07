@@ -11,11 +11,6 @@ namespace BlazorApp.Client.Application
             var counter = CounterReducer.Reduce(state.Counter, action);
             var forecast = ForecastReducer.Reduce(state.Forecast, action);
 
-            if (counter == state.Counter && forecast == state.Forecast)
-            {
-                return state;
-            }
-
             return state with {
                 Counter = counter,
                 Forecast = forecast
