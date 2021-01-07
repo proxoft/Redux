@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Proxoft.Redux.Hosting</RootNamespace>
+        <AssemblyName>Proxoft.Redux.Hosting</AssemblyName>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>services
+    .UseRedux&lt;ApplicationState&gt;()
+    .UseDefaultDispatcher()
+    .UseReducerFunc(ApplicationReducer.Reduce)
+    .UseDefaultStateStream()
+    .AddEffects(Assembly.GetExecutingAssembly())
+    .Prepare()
+    .Build();</Description>
+        <Copyright>www.proxoft.sk</Copyright>
+        <Authors>Proxoft s.r.o.</Authors>
+        
+        <Product>Proxoft Redux</Product>
+        <PackageIcon>Icon.png</PackageIcon>
+        <Version>1.0.1</Version>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <OutputPath></OutputPath>
+      <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <OutputPath>..\..\..\release\Hosting\</OutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\Icons\Icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
+
+</Project>
