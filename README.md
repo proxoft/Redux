@@ -1,5 +1,6 @@
 # Redux
 
+```csharp
 builder.Services
   .UseRedux<ApplicationState>(ServiceLifetime.Scoped)
   .UseDefaultDispatcher()
@@ -8,3 +9,4 @@ builder.Services
   .AddEffects(Assembly.GetExecutingAssembly())
   .Prepare()
   .Build();
+```
