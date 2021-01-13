@@ -12,7 +12,8 @@
             user IActionEffect or IStateEffect to implement Effect.
         </Description>
         <PackageIcon>Icon.png</PackageIcon>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
+        <PackageLicenseFile>license.txt</PackageLicenseFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,6 +31,10 @@
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
       <None Include="..\Icons\Icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+      <None Include="..\license.txt">
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>
