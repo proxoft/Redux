@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Proxoft.Redux.Core;
 using Proxoft.Redux.Core.Dispatcher;
+using Proxoft.Redux.Core.ExceptionHandling;
 
 namespace Proxoft.Redux.Hosting.Builders
 {
@@ -13,7 +14,6 @@ namespace Proxoft.Redux.Hosting.Builders
         IActionDispatcherBuilder<TState>,
         IReducerBuilder<TState>,
         IStateStreamBuilder<TState>,
-        IEffectsBuilder<TState>,
         IStoreBuilder<TState>
     {
         private readonly IServiceCollection _services;
@@ -25,10 +25,14 @@ namespace Proxoft.Redux.Hosting.Builders
 
         private readonly List<Type> _effectTypes = new();
 
+        private ServiceDescriptor _exceptionHandler;
+
         public StoreBuilder(IServiceCollection services, ServiceLifetime serviceLifetime)
         {
             _services = services;
             _serviceLifetime = serviceLifetime;
+
+            this.UseExceptionHandler(exception => throw exception);
         }
 
         public IReducerBuilder<TState> UseDefaultDispatcher()
@@ -74,13 +78,13 @@ namespace Proxoft.Redux.Hosting.Builders
             return this;
         }
 
-        public IEffectsBuilder<TState> UseDefaultStateStream()
+        public IStoreBuilder<TState> UseDefaultStateStream()
             => this.UseDefaultStateStream(Scheduler.CurrentThread);
 
-        public IEffectsBuilder<TState> UseDefaultStateStream(IScheduler scheduler)
+        public IStoreBuilder<TState> UseDefaultStateStream(IScheduler scheduler)
             => this.UseStateStream(new DefaultStateStream<TState>(scheduler));
 
-        public IEffectsBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream : IStateStreamSubject<TState>
+        public IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream : IStateStreamSubject<TState>
         {
             _stateStreamDescriptors = new[] {
                 this.ToServiceDescriptor<IStateStream<TState>>(stateStreamSubject),
@@ -92,19 +96,19 @@ namespace Proxoft.Redux.Hosting.Builders
             return this;
         }
 
-        public IEffectsBuilder<TState> AddEffect<TEffectType>() where TEffectType: IEffect<TState>
+        public IStoreBuilder<TState> AddEffect<TEffectType>() where TEffectType: IEffect<TState>
         {
             _effectTypes.Add(typeof(TEffectType));
             return this;
         }
 
-        public IEffectsBuilder<TState> AddEffects(params Type[] effectTypes)
+        public IStoreBuilder<TState> AddEffects(params Type[] effectTypes)
         {
             _effectTypes.AddRange(effectTypes);
             return this;
         }
 
-        public IEffectsBuilder<TState> AddEffects(params Assembly[] fromAssemblies)
+        public IStoreBuilder<TState> AddEffects(params Assembly[] fromAssemblies)
         {
             var effectTypes = fromAssemblies
                 .SelectMany(a => a.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && t.Implements<IEffect<TState>>()))
@@ -113,26 +117,46 @@ namespace Proxoft.Redux.Hosting.Builders
             return this.AddEffects(effectTypes);
         }
 
-        public IStoreBuilder<TState> Prepare()
+        public IStoreBuilder<TState> UseRethrowExceptionHandler()
         {
+            return this.UseExceptionHandler(exception => throw exception);
+        }
+
+        public IStoreBuilder<TState> UseExceptionHandler<TExceptionHandler>()
+            where TExceptionHandler : IExceptionHandler
+        {
+            _exceptionHandler = this.ToServiceDescriptor<IExceptionHandler, TExceptionHandler>();
             return this;
         }
 
-        public void Build()
+        public IStoreBuilder<TState> UseExceptionHandler(Action<Exception> exceptionHandler)
         {
-            foreach(var sd in _stateStreamDescriptors.Concat(_actionDispatcherDescriptors))
+            _exceptionHandler = new ServiceDescriptor(
+                typeof(IExceptionHandler),
+                _ => {
+                    return new ActionExceptionHandler(exceptionHandler);
+                },
+                _serviceLifetime);
+
+            return this;
+        }
+
+        public void Register()
+        {
+            foreach (var sd in _stateStreamDescriptors.Concat(_actionDispatcherDescriptors))
             {
                 _services.Add(sd);
             }
 
             _services.Add(_reducerDescriptor);
 
-            foreach(var et in _effectTypes)
+            foreach (var et in _effectTypes)
             {
                 _services.Add(this.ToServiceDescriptor<IEffect<TState>>(et));
             }
 
             _services.Add(this.ToServiceDescriptor<Store<TState>>());
+            _services.Add(_exceptionHandler);
         }
 
         private ServiceDescriptor ToServiceDescriptor<TService>()

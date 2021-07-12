@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Proxoft.Redux.Core.Actions;
+using Proxoft.Redux.Core.ExceptionHandling;
 
 namespace Proxoft.Redux.Core
 {
@@ -14,6 +15,7 @@ namespace Proxoft.Redux.Core
         private readonly IStateStreamSubject<T> _stateStreamSubject;
         private readonly IEnumerable<IEffect<T>> _effects;
         private readonly Subject<StateActionPair<T>> _effectStream = new();
+        private readonly IExceptionHandler _exceptionHandler;
 
         private IDisposable _dispatcherSubscription;
         private IDisposable _effectsSubscription;
@@ -22,12 +24,14 @@ namespace Proxoft.Redux.Core
             IActionDispatcher dispatcher,
             IReducer<T> reducer,
             IStateStreamSubject<T> stateStreamSubject,
-            IEnumerable<IEffect<T>> effects)
+            IEnumerable<IEffect<T>> effects,
+            IExceptionHandler exceptionHandler)
         {
             _dispatcher = dispatcher;
             _reducer = reducer;
             _stateStreamSubject = stateStreamSubject;
             _effects = effects;
+            _exceptionHandler = exceptionHandler;
         }
 
         public void Dispose()
@@ -69,12 +73,10 @@ namespace Proxoft.Redux.Core
                 .Subscribe(
                     pair =>
                     {
-                        // Debug Log
+                        // eventually do (debug) log
                     },
-                    exception =>
-                    {
-                        Console.WriteLine(exception);
-                    });
+                    e => _exceptionHandler.OnException(e)
+                );
 
             _dispatcher.Dispatch(DefaultActions.Initialize);
 

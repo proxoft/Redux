@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Reflection;
 using Proxoft.Redux.Core;
+using Proxoft.Redux.Core.ExceptionHandling;
 
 namespace Proxoft.Redux.Hosting.Builders
 {
@@ -22,22 +23,21 @@ namespace Proxoft.Redux.Hosting.Builders
 
     public interface IStateStreamBuilder<TState>
     {
-        IEffectsBuilder<TState> UseDefaultStateStream();
-        IEffectsBuilder<TState> UseDefaultStateStream(IScheduler scheduler);
-        IEffectsBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream: IStateStreamSubject<TState>;
-    }
-
-    public interface IEffectsBuilder<TState>
-    {
-        IEffectsBuilder<TState> AddEffect<TEffectType>() where TEffectType : IEffect<TState>;
-        IEffectsBuilder<TState> AddEffects(params Type[] effectTypes);
-        IEffectsBuilder<TState> AddEffects(params Assembly[] fromAssemblies);
-
-        IStoreBuilder<TState> Prepare();
+        IStoreBuilder<TState> UseDefaultStateStream();
+        IStoreBuilder<TState> UseDefaultStateStream(IScheduler scheduler);
+        IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream: IStateStreamSubject<TState>;
     }
 
     public interface IStoreBuilder<TState>
     {
-        void Build();
+        IStoreBuilder<TState> AddEffect<TEffectType>() where TEffectType : IEffect<TState>;
+        IStoreBuilder<TState> AddEffects(params Type[] effectTypes);
+        IStoreBuilder<TState> AddEffects(params Assembly[] fromAssemblies);
+
+        IStoreBuilder<TState> UseRethrowExceptionHandler();
+        IStoreBuilder<TState> UseExceptionHandler<TExceptionHandler>() where TExceptionHandler : IExceptionHandler;
+        IStoreBuilder<TState> UseExceptionHandler(Action<Exception> exceptionHandler);
+
+        void Register();
     }
 }
