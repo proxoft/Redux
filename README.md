@@ -7,6 +7,6 @@ builder.Services
   .UseReducer<ApplicationReducer>()
   .UseDefaultStateStream()
   .AddEffects(Assembly.GetExecutingAssembly())
-  .Prepare()
-  .Build();
+  .Register()
+  ;
 ```
