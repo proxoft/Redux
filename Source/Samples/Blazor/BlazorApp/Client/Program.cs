@@ -27,8 +27,7 @@ namespace BlazorApp.Client
                 .UseReducer<ApplicationReducer>()
                 .UseDefaultStateStream()
                 .AddEffects(Assembly.GetExecutingAssembly())
-                .Prepare()
-                .Build();
+                .Register();
 
             var host = builder.Build();
             var store = host.Services.GetRequiredService<Store<ApplicationState>>();

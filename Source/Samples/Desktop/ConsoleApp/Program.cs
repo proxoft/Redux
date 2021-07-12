@@ -28,6 +28,10 @@ namespace ConsoleApp
             var dispatcher = host.Services.GetRequiredService<IActionDispatcher>();
             dispatcher.Dispatch(new SetMessageAction("Message dispatched from Program.Main"));
 
+            dispatcher.Dispatch(new FireExceptionAction(false, true));
+
+            dispatcher.Dispatch(new SetMessageAction("!!!!Message after the exception action has been dispatched", source: "program"));
+
             host.Dispose();
 
             Console.WriteLine("Goodbye Redux");
@@ -50,8 +54,11 @@ namespace ConsoleApp
                         .UseReducerFunc(ApplicationReducer.Reduce)
                         .UseDefaultStateStream()
                         .AddEffects(Assembly.GetExecutingAssembly())
-                        .Prepare()
-                        .Build();
+                        .UseExceptionHandler(e => {
+                            Console.WriteLine("Exception handler");
+                            Console.WriteLine(e.Message);
+                        })
+                        .Register();
                 });
 
             return host;
