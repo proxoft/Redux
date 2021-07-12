@@ -28,15 +28,6 @@ namespace Proxoft.Redux.Hosting.Builders
         IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream: IStateStreamSubject<TState>;
     }
 
-    //public interface IEffectsBuilder<TState>
-    //{
-    //    IEffectsBuilder<TState> AddEffect<TEffectType>() where TEffectType : IEffect<TState>;
-    //    IEffectsBuilder<TState> AddEffects(params Type[] effectTypes);
-    //    IEffectsBuilder<TState> AddEffects(params Assembly[] fromAssemblies);
-
-    //    IStoreBuilder<TState> Prepare();
-    //}
-
     public interface IStoreBuilder<TState>
     {
         IStoreBuilder<TState> AddEffect<TEffectType>() where TEffectType : IEffect<TState>;
