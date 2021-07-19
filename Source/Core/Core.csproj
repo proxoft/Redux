@@ -9,9 +9,10 @@
         <Description>Implementation of Redux for .NET</Description>
         <Product>Proxoft Redux</Product>
         <PackageIcon>Icon.png</PackageIcon>
-        <Version>2.1.0</Version>
+        <Version>2.1.1</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
+        <PackageTags>Redux</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
