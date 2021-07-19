@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>9.0</LangVersion>
         <RootNamespace>Proxoft.Redux.Hosting</RootNamespace>
         <AssemblyName>Proxoft.Redux.Hosting</AssemblyName>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
