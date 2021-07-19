@@ -14,7 +14,7 @@ namespace Proxoft.Redux.Core
         private readonly IReducer<T> _reducer;
         private readonly IStateStreamSubject<T> _stateStreamSubject;
         private readonly IEnumerable<IEffect<T>> _effects;
-        private readonly Subject<StateActionPair<T>> _effectStream = new();
+        private readonly Subject<StateActionPair<T>> _effectStream = new Subject<StateActionPair<T>>();
         private readonly IExceptionHandler _exceptionHandler;
 
         private IDisposable _dispatcherSubscription;
@@ -63,7 +63,7 @@ namespace Proxoft.Redux.Core
                     (acc, action) =>
                     {
                         var state = _reducer.Reduce(acc.State, action);
-                        return new(state, action);
+                        return new StateActionPair<T>(state, action);
                     })
                 .Do(pair =>
                 {

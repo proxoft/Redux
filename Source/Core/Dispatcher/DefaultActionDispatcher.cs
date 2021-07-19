@@ -16,7 +16,7 @@ namespace Proxoft.Redux.Core.Dispatcher
 
         public DefaultActionDispatcher(IScheduler scheduler)
         {
-            _dispatcher = new();
+            _dispatcher = new Subject<IAction>();
             _observableDispatcher = _dispatcher.ObserveOn(scheduler);
         }
 
