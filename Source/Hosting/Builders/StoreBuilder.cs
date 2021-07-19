@@ -23,7 +23,7 @@ namespace Proxoft.Redux.Hosting.Builders
         private ServiceDescriptor _reducerDescriptor;
         private ServiceDescriptor[] _stateStreamDescriptors;
 
-        private readonly List<Type> _effectTypes = new();
+        private readonly List<Type> _effectTypes = new List<Type>();
 
         private ServiceDescriptor _exceptionHandler;
 
@@ -160,18 +160,18 @@ namespace Proxoft.Redux.Hosting.Builders
         }
 
         private ServiceDescriptor ToServiceDescriptor<TService>()
-            => new (typeof(TService), typeof(TService), _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), typeof(TService), _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>() where TImplementation : TService
-            => new (typeof(TService), typeof(TImplementation), _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), typeof(TImplementation), _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(TImplementation instance) where TImplementation : TService
-            => new(typeof(TService), sp => instance, _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), sp => instance, _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService>(Type implementation)
-            => new (typeof(TService), implementation, _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), implementation, _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService>(object instance)
-            => new (typeof(TService), sp => instance, _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), sp => instance, _serviceLifetime);
     }
 }

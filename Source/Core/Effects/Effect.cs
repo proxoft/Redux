@@ -9,8 +9,8 @@ namespace Proxoft.Redux.Core
 {
     public abstract class Effect<TState> : IEffect<TState>
     {
-        private readonly SubscriptionsManager _subscriptionsManager = new();
-        private readonly Subject<IAction> _actionsSubject = new ();
+        private readonly SubscriptionsManager _subscriptionsManager = new SubscriptionsManager();
+        private readonly Subject<IAction> _actionsSubject = new Subject<IAction>();
 
         public IObservable<IAction> Actions => _actionsSubject;
 
