@@ -12,6 +12,7 @@
         <Version>2.2.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
+        <PackageTags>Redux</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
