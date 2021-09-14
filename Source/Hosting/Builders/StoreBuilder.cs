@@ -19,13 +19,13 @@ namespace Proxoft.Redux.Hosting.Builders
         private readonly IServiceCollection _services;
         private readonly ServiceLifetime _serviceLifetime;
 
-        private ServiceDescriptor[] _actionDispatcherDescriptors;
-        private ServiceDescriptor _reducerDescriptor;
-        private ServiceDescriptor[] _stateStreamDescriptors;
+        private ServiceDescriptor[] _actionDispatcherDescriptors = Array.Empty<ServiceDescriptor>();
+        private ServiceDescriptor? _reducerDescriptor;
+        private ServiceDescriptor[] _stateStreamDescriptors = Array.Empty<ServiceDescriptor>();
 
         private readonly List<Type> _effectTypes = new List<Type>();
 
-        private ServiceDescriptor _exceptionHandler;
+        private ServiceDescriptor? _exceptionHandler;
 
         public StoreBuilder(IServiceCollection services, ServiceLifetime serviceLifetime)
         {
@@ -36,10 +36,16 @@ namespace Proxoft.Redux.Hosting.Builders
         }
 
         public IReducerBuilder<TState> UseDefaultDispatcher()
-            => this.UseDefaultDispatcher(Scheduler.CurrentThread);
+            => this.UseDefaultDispatcher(_ => { });
 
-        public IReducerBuilder<TState> UseDefaultDispatcher(IScheduler scheduler = null)
-            => this.UseDispatcher(new DefaultActionDispatcher(scheduler ?? Scheduler.CurrentThread));
+        public IReducerBuilder<TState> UseDefaultDispatcher(Action<DispatcherOptions> configure)
+        {
+            DispatcherOptions options = new DispatcherOptions();
+            configure(options);
+
+            Action<IAction> emptyJournaler = _ => { };
+            return this.UseDispatcher(new DefaultActionDispatcher(options.Journaller ?? emptyJournaler, options.Scheduler ?? Scheduler.CurrentThread));
+        }
 
         public IReducerBuilder<TState> UseDispatcher<TActionDispatcher>() where TActionDispatcher : IActionDispatcher
         {
@@ -148,7 +154,11 @@ namespace Proxoft.Redux.Hosting.Builders
                 _services.Add(sd);
             }
 
-            _services.Add(_reducerDescriptor);
+            if(_reducerDescriptor != null)
+            {
+                _services.Add(_reducerDescriptor);
+            }
+            
 
             foreach (var et in _effectTypes)
             {
@@ -156,7 +166,11 @@ namespace Proxoft.Redux.Hosting.Builders
             }
 
             _services.Add(this.ToServiceDescriptor<Store<TState>>());
-            _services.Add(_exceptionHandler);
+
+            if(_exceptionHandler != null)
+            {
+                _services.Add(_exceptionHandler);
+            }
         }
 
         private ServiceDescriptor ToServiceDescriptor<TService>()
@@ -166,7 +180,7 @@ namespace Proxoft.Redux.Hosting.Builders
             => new ServiceDescriptor(typeof(TService), typeof(TImplementation), _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(TImplementation instance) where TImplementation : TService
-            => new ServiceDescriptor(typeof(TService), sp => instance, _serviceLifetime);
+            => new ServiceDescriptor(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService>(Type implementation)
             => new ServiceDescriptor(typeof(TService), implementation, _serviceLifetime);

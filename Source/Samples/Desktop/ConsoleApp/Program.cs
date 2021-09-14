@@ -50,7 +50,13 @@ namespace ConsoleApp
                 {
                     services
                         .UseRedux<ApplicationState>()
-                        .UseDefaultDispatcher()
+                        .UseDefaultDispatcher(options =>
+                        {
+                            options.Journaller = (IAction action) =>
+                            {
+                                Console.WriteLine($"Log: {action.GetType().Name}");
+                            };
+                        })
                         .UseReducerFunc(ApplicationReducer.Reduce)
                         .UseDefaultStateStream()
                         .AddEffects(Assembly.GetExecutingAssembly())
