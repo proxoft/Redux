@@ -17,10 +17,10 @@
         <Authors>Proxoft s.r.o.</Authors>
         <Product>Proxoft Redux</Product>
         <PackageIcon>Icon.png</PackageIcon>
-        <Version>2.1.1</Version>
+        <Version>2.2.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
-        <PackageTags>Redux</PackageTags>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -9,7 +9,7 @@ namespace Proxoft.Redux.Hosting.Builders
     public interface IActionDispatcherBuilder<TState>
     {
         IReducerBuilder<TState> UseDefaultDispatcher();
-        IReducerBuilder<TState> UseDefaultDispatcher(IScheduler scheduler);
+        IReducerBuilder<TState> UseDefaultDispatcher(Action<DispatcherOptions> configure);
         IReducerBuilder<TState> UseDispatcher<TActionDispatcher>() where TActionDispatcher : IActionDispatcher;
         IReducerBuilder<TState> UseDispatcher<TActionDispatcher>(TActionDispatcher actionDispatcher) where TActionDispatcher : IActionDispatcher;
     }
