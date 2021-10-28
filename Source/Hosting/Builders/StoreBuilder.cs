@@ -102,6 +102,17 @@ namespace Proxoft.Redux.Hosting.Builders
             return this;
         }
 
+        public IStoreBuilder<TState> UseStateStream<TStateStream>() where TStateStream : class, IStateStreamSubject<TState>
+        {
+            _stateStreamDescriptors = new[] {
+                this.ToServiceDescriptor<TStateStream>(),
+                this.ToServiceDescriptor<IStateStream<TState>, TStateStream>(r => r.GetRequiredService<TStateStream>()),
+                this.ToServiceDescriptor<IStateStreamSubject<TState>, TStateStream>(r => r.GetRequiredService<TStateStream>())
+            };
+
+            return this;
+        }
+
         public IStoreBuilder<TState> AddEffect<TEffectType>() where TEffectType: IEffect<TState>
         {
             _effectTypes.Add(typeof(TEffectType));
@@ -178,6 +189,9 @@ namespace Proxoft.Redux.Hosting.Builders
 
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>() where TImplementation : TService
             => new ServiceDescriptor(typeof(TService), typeof(TImplementation), _serviceLifetime);
+
+        private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(Func<IServiceProvider, TImplementation> resolve) where TImplementation : class, TService
+            => new ServiceDescriptor(typeof(TService), resolve, _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(TImplementation instance) where TImplementation : TService
             => new ServiceDescriptor(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
