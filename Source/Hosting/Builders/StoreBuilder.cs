@@ -61,7 +61,6 @@ namespace Proxoft.Redux.Hosting.Builders
         {
             _actionDispatcherDescriptors = new[]
             {
-                this.ToServiceDescriptor<IActionDispatcher>(actionDispatcher),
                 this.ToServiceDescriptor<IActionDispatcher, TActionDispatcher>(actionDispatcher)
             };
 
@@ -93,9 +92,7 @@ namespace Proxoft.Redux.Hosting.Builders
         public IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream : IStateStreamSubject<TState>
         {
             _stateStreamDescriptors = new[] {
-                this.ToServiceDescriptor<IStateStream<TState>>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStream<TState>, TStateStream>(stateStreamSubject),
-                this.ToServiceDescriptor<IStateStreamSubject<TState>>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStreamSubject<TState>, TStateStream>(stateStreamSubject)
             };
 
@@ -198,8 +195,5 @@ namespace Proxoft.Redux.Hosting.Builders
 
         private ServiceDescriptor ToServiceDescriptor<TService>(Type implementation)
             => new ServiceDescriptor(typeof(TService), implementation, _serviceLifetime);
-
-        private ServiceDescriptor ToServiceDescriptor<TService>(object instance)
-            => new ServiceDescriptor(typeof(TService), sp => instance, _serviceLifetime);
     }
 }
