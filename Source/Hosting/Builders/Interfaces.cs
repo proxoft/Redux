@@ -25,6 +25,7 @@ namespace Proxoft.Redux.Hosting.Builders
     {
         IStoreBuilder<TState> UseDefaultStateStream();
         IStoreBuilder<TState> UseDefaultStateStream(IScheduler scheduler);
+        IStoreBuilder<TState> UseStateStream<TStateStream>() where TStateStream: class, IStateStreamSubject<TState>;
         IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream: IStateStreamSubject<TState>;
     }
 

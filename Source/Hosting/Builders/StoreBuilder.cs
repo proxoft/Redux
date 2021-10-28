@@ -61,7 +61,6 @@ namespace Proxoft.Redux.Hosting.Builders
         {
             _actionDispatcherDescriptors = new[]
             {
-                this.ToServiceDescriptor<IActionDispatcher>(actionDispatcher),
                 this.ToServiceDescriptor<IActionDispatcher, TActionDispatcher>(actionDispatcher)
             };
 
@@ -93,10 +92,19 @@ namespace Proxoft.Redux.Hosting.Builders
         public IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream : IStateStreamSubject<TState>
         {
             _stateStreamDescriptors = new[] {
-                this.ToServiceDescriptor<IStateStream<TState>>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStream<TState>, TStateStream>(stateStreamSubject),
-                this.ToServiceDescriptor<IStateStreamSubject<TState>>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStreamSubject<TState>, TStateStream>(stateStreamSubject)
+            };
+
+            return this;
+        }
+
+        public IStoreBuilder<TState> UseStateStream<TStateStream>() where TStateStream : class, IStateStreamSubject<TState>
+        {
+            _stateStreamDescriptors = new[] {
+                this.ToServiceDescriptor<TStateStream>(),
+                this.ToServiceDescriptor<IStateStream<TState>, TStateStream>(r => r.GetRequiredService<TStateStream>()),
+                this.ToServiceDescriptor<IStateStreamSubject<TState>, TStateStream>(r => r.GetRequiredService<TStateStream>())
             };
 
             return this;
@@ -179,13 +187,13 @@ namespace Proxoft.Redux.Hosting.Builders
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>() where TImplementation : TService
             => new ServiceDescriptor(typeof(TService), typeof(TImplementation), _serviceLifetime);
 
+        private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(Func<IServiceProvider, TImplementation> resolve) where TImplementation : class, TService
+            => new ServiceDescriptor(typeof(TService), resolve, _serviceLifetime);
+
         private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(TImplementation instance) where TImplementation : TService
             => new ServiceDescriptor(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
 
         private ServiceDescriptor ToServiceDescriptor<TService>(Type implementation)
             => new ServiceDescriptor(typeof(TService), implementation, _serviceLifetime);
-
-        private ServiceDescriptor ToServiceDescriptor<TService>(object instance)
-            => new ServiceDescriptor(typeof(TService), sp => instance, _serviceLifetime);
     }
 }
