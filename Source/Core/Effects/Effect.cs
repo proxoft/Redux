@@ -14,7 +14,7 @@ namespace Proxoft.Redux.Core
 
         public IObservable<IAction> Actions => _actionsSubject;
 
-        protected IObservable<StateActionPair<TState>> StateActionStream { get; private set; }
+        protected IObservable<StateActionPair<TState>> StateActionStream { get; private set; } = Observable.Never<StateActionPair<TState>>();
 
         protected IObservable<IAction> ActionStream => this.StateActionStream.Select(pair => pair.Action);
 

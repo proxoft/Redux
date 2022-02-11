@@ -1,0 +1,17 @@
+﻿<Project>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Proxoft s.r.o.</Authors>
+        <Copyright>www.proxoft.sk</Copyright>
+        <Product>Proxoft Redux</Product>
+
+        <Version>2.4.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/proxoft/Redux</RepositoryUrl>
+        <PackageTags>Redux;State Management</PackageTags>
+    </PropertyGroup>
+</Project>
