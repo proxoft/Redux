@@ -5,7 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Proxoft.Redux.Core;
-using Proxoft.Redux.Core.Dispatcher;
+using Proxoft.Redux.Core.Dispatchers;
 using Proxoft.Redux.Core.ExceptionHandling;
 
 namespace Proxoft.Redux.Hosting.Builders
@@ -92,6 +92,7 @@ namespace Proxoft.Redux.Hosting.Builders
         public IStoreBuilder<TState> UseStateStream<TStateStream>(TStateStream stateStreamSubject) where TStateStream : IStateStreamSubject<TState>
         {
             _stateStreamDescriptors = new[] {
+                this.ToServiceDescriptor<IObservable<TState>, TStateStream>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStream<TState>, TStateStream>(stateStreamSubject),
                 this.ToServiceDescriptor<IStateStreamSubject<TState>, TStateStream>(stateStreamSubject)
             };

@@ -17,16 +17,9 @@ namespace BlazorApp.Client.Pages
             WeatherForecasts = Array.Empty<WeatherForecast>()
         };
 
-        [Inject]
-        public IStateStream<ApplicationState> AppStream { get; set; }
-
-        [Inject]
-        public IActionDispatcher Dispatcher { get; set; }
-
         public void Dispose()
         {
             _sm.Dispose();
-            _sm = null;
         }
 
         protected override void OnInitialized()

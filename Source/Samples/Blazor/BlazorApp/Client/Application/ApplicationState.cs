@@ -17,8 +17,8 @@ namespace BlazorApp.Client.Application
             }
         };
 
-        public CounterState Counter { get; init; }
+        public CounterState Counter { get; init; } = new();
 
-        public ForecastState Forecast { get; init; }
+        public ForecastState Forecast { get; init; } = new();
     }
 }

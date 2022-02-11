@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
         <RootNamespace>Proxoft.Redux.Hosting</RootNamespace>
         <AssemblyName>Proxoft.Redux.Hosting</AssemblyName>
         <Description>services
@@ -12,7 +11,7 @@
     .AddEffects(Assembly.GetExecutingAssembly())
     .Register();
         </Description>
-        <Nullable>enable</Nullable>
+        <PackageIcon>Icon.png</PackageIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

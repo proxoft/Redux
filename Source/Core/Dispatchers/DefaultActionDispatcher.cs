@@ -3,7 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-namespace Proxoft.Redux.Core.Dispatcher
+namespace Proxoft.Redux.Core.Dispatchers
 {
     public class DefaultActionDispatcher : IActionDispatcher
     {
