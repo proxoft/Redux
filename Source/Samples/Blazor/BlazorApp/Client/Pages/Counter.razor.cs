@@ -5,9 +5,8 @@ using Proxoft.Redux.Core.Tools;
 
 namespace BlazorApp.Client.Pages
 {
-    public sealed partial class Counter : IDisposable
+    public sealed partial class Counter
     {
-        private SubscriptionsManager _sm = new ();
         private CounterState _state = new ();
 
         private void OnClick()
@@ -24,18 +23,12 @@ namespace BlazorApp.Client.Pages
         {
             base.OnInitialized();
 
-            _sm.AddSubscriptions(
+            this.AddSubscriptions(
                 this.AppStream
                     .Select(a => a.Counter)
                     .DistinctUntilChanged()
                     .Subscribe(c => _state = c)
             );
-        }
-
-        public void Dispose()
-        {
-            _sm.Dispose();
-            _sm = null;
         }
     }
 }

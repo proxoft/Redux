@@ -6,7 +6,7 @@ namespace Proxoft.Redux.Core.Extensions
 {
     public static class StoreExtensions
     {
-        public static IObservable<(TS, TA)> WhereStateAction<TS, TA>(
+        public static IObservable<(TS state, TA action)> WhereStateAction<TS, TA>(
             this IObservable<StateActionPair<TS>> source,
             Func<TS, bool> statePredicate)
             where TA : IAction
@@ -15,7 +15,7 @@ namespace Proxoft.Redux.Core.Extensions
                 WhereStateAction<TS, TA>(statePredicate, _ => true);
         }
 
-        public static IObservable<(TS, TA)> WhereStateAction<TS, TA>(
+        public static IObservable<(TS state, TA action)> WhereStateAction<TS, TA>(
             this IObservable<StateActionPair<TS>> source,
             Func<TA, bool> actionPredicate)
             where TA : IAction
@@ -24,7 +24,7 @@ namespace Proxoft.Redux.Core.Extensions
                 WhereStateAction(_ => true, actionPredicate);
         }
 
-        public static IObservable<(TS, TA)> WhereStateAction<TS, TA>(
+        public static IObservable<(TS state, TA action)> WhereStateAction<TS, TA>(
             this IObservable<StateActionPair<TS>> source,
             Func<TS, bool> statePredicate,
             Func<TA, bool> actionPredicate)

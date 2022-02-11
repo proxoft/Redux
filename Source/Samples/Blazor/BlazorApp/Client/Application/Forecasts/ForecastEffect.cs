@@ -28,7 +28,7 @@ namespace BlazorApp.Client.Application.Forecasts
                 .OfType<FetchWeatherForcastDataAction>()
                 .Select(_ => Observable.FromAsync(() => _httpClient.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast")))
                 .Merge()
-                .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data)));
+                .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data ?? Array.Empty<WeatherForecast>())));
         }
     }
 }
