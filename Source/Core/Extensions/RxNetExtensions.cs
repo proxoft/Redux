@@ -58,8 +58,7 @@ namespace Proxoft.Redux.Core.Extensions
             Func<T, Task> taskFactory)
         {
             return source
-                .SelectAsync(s => ExecuteTask(s, taskFactory))
-                ;
+                .SelectAsync(s => ExecuteTask(s, taskFactory));
         }
 
         private static async Task<T> ExecuteTask<T>(T throughput, Func<T, Task> taskToExecute)
