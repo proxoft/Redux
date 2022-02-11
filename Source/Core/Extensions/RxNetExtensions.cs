@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Proxoft.Redux.Core.Extensions
 {
@@ -41,6 +42,30 @@ namespace Proxoft.Redux.Core.Extensions
             return source
                 .OfType<T>()
                 .Where(i => predicate(i));
+        }
+
+        public static IObservable<TR> SelectAsync<TS, TR>(
+            this IObservable<TS> source,
+            Func<TS, Task<TR>> taskFactory)
+        {
+            return source
+                .Select(s => Observable.FromAsync(() => taskFactory(s)))
+                .Merge();
+        }
+
+        public static IObservable<T> DoAsync<T>(
+            this IObservable<T> source,
+            Func<T, Task> taskFactory)
+        {
+            return source
+                .SelectAsync(s => ExecuteTask(s, taskFactory))
+                ;
+        }
+
+        private static async Task<T> ExecuteTask<T>(T throughput, Func<T, Task> taskToExecute)
+        {
+            await taskToExecute(throughput);
+            return throughput;
         }
     }
 }

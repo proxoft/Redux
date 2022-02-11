@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using BlazorApp.Shared;
 using Proxoft.Redux.Core;
+using Proxoft.Redux.Core.Extensions;
 
 namespace BlazorApp.Client.Application.Forecasts
 {
@@ -26,9 +29,23 @@ namespace BlazorApp.Client.Application.Forecasts
         {
             return actionStream
                 .OfType<FetchWeatherForcastDataAction>()
-                .Select(_ => Observable.FromAsync(() => _httpClient.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast")))
-                .Merge()
-                .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data ?? Array.Empty<WeatherForecast>())));
+                .SelectAsync(action => this.FetchData(action))
+                .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data)));
+        }
+
+        private async Task<WeatherForecast[]> FetchData(FetchWeatherForcastDataAction action)
+        {
+            try
+            {
+                var data = await _httpClient.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast")
+                    ?? Array.Empty<WeatherForecast>();
+
+                return data;
+            }
+            catch
+            {
+                return Array.Empty<WeatherForecast>();
+            }
         }
     }
 }

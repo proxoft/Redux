@@ -27,6 +27,10 @@ namespace BlazorApp.Client
                 .UseReducer<ApplicationReducer>()
                 .UseDefaultStateStream()
                 .AddEffects(Assembly.GetExecutingAssembly())
+                .UseExceptionHandler(exception =>
+                {
+                    Console.WriteLine(exception);
+                })
                 .Register();
 
             var host = builder.Build();
