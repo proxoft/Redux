@@ -17,8 +17,8 @@ namespace Proxoft.Redux.Core
         private readonly Subject<StateActionPair<T>> _effectStream = new Subject<StateActionPair<T>>();
         private readonly IExceptionHandler _exceptionHandler;
 
-        private IDisposable _dispatcherSubscription;
-        private IDisposable _effectsSubscription;
+        private IDisposable? _dispatcherSubscription;
+        private IDisposable? _effectsSubscription;
 
         public Store(
             IActionDispatcher dispatcher,
@@ -59,7 +59,7 @@ namespace Proxoft.Redux.Core
 
             _dispatcherSubscription = _dispatcher
                 .Scan(
-                    new StateActionPair<T>(init, null),
+                    new StateActionPair<T>(init, default),
                     (acc, action) =>
                     {
                         var state = _reducer.Reduce(acc.State, action);

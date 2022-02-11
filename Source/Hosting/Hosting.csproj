@@ -4,7 +4,6 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <RootNamespace>Proxoft.Redux.Hosting</RootNamespace>
         <AssemblyName>Proxoft.Redux.Hosting</AssemblyName>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>services
     .UseRedux&lt;ApplicationState&gt;()
     .UseDefaultDispatcher()
@@ -13,13 +12,6 @@
     .AddEffects(Assembly.GetExecutingAssembly())
     .Register();
         </Description>
-        <Copyright>www.proxoft.sk</Copyright>
-        <Authors>Proxoft s.r.o.</Authors>
-        <Product>Proxoft Redux</Product>
-        <PackageIcon>Icon.png</PackageIcon>
-        <Version>2.3.0</Version>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 

@@ -1,0 +1,16 @@
+﻿<Project>
+    <PropertyGroup>
+        
+       
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Proxoft s.r.o.</Authors>
+        <Copyright>www.proxoft.sk</Copyright>
+        <Product>Proxoft Redux</Product>
+        <PackageIcon>Icon.png</PackageIcon>
+        <Version>2.4.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
+        <PackageTags>Redux;State Management</PackageTags>
+    </PropertyGroup>
+</Project>
