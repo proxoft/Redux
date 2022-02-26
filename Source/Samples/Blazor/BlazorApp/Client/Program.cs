@@ -22,16 +22,15 @@ namespace BlazorApp.Client
 
             builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services
-                .UseRedux<ApplicationState>(ServiceLifetime.Scoped)
-                .UseDefaultDispatcher()
-                .UseReducer<ApplicationReducer>()
-                .UseDefaultStateStream()
-                .AddEffects(Assembly.GetExecutingAssembly())
-                .UseExceptionHandler(exception =>
+                .AddRedux<ApplicationState>(rb =>
                 {
-                    Console.WriteLine(exception);
-                })
-                .Register();
+                    rb.UseReducer<ApplicationReducer>()
+                        .UseJournaler<ActionJournaler>()
+                        .AddEffects(Assembly.GetExecutingAssembly())
+                        .UseExceptionHandler<StoreExceptionHandler>()
+                    ;
+                },
+                ServiceLifetime.Scoped);
 
             var host = builder.Build();
             var store = host.Services.GetRequiredService<Store<ApplicationState>>();
