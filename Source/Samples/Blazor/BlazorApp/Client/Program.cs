@@ -32,18 +32,6 @@ namespace BlazorApp.Client
                 },
                 ServiceLifetime.Scoped);
 
-            //builder.Services
-            //    .UseRedux<ApplicationState>(ServiceLifetime.Scoped)
-            //    .UseDefaultDispatcher()
-            //    .UseReducer<ApplicationReducer>()
-            //    .UseDefaultStateStream()
-            //    .AddEffects(Assembly.GetExecutingAssembly())
-            //    .UseExceptionHandler(exception =>
-            //    {
-            //        Console.WriteLine(exception);
-            //    })
-            //    .Register();
-
             var host = builder.Build();
             var store = host.Services.GetRequiredService<Store<ApplicationState>>();
 
