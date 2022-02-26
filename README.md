@@ -20,14 +20,18 @@ public record CounterState
 They only need to implement the markup interface Redux.IAction.
 
 ```C#
-public class IncrementAction : IAction { }
+public class IncreaseCounterAction : IAction
+{
+	public IncreaseCounterAction(int byValue)
+	{
+		this.ByValue = byValue;
+	}
+
+	public int ByValue { get; }
+}
     
 public class ResetCounter : IAction { }
-    
-public class FetchWeatherForcastDataAction : IAction
-{
-    public string Text { get; set; }
-}
+
 ```
 
 #### Reducers
