@@ -34,9 +34,6 @@ namespace BlazorApp.Client
 
             var host = builder.Build();
             var store = host.Services.GetRequiredService<Store<ApplicationState>>();
-
-            var cs = new CounterState();
-
             store.Initialize(() => ApplicationState.Init);
 
             await host.RunAsync();
