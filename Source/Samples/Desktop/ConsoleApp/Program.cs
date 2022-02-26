@@ -28,9 +28,10 @@ namespace ConsoleApp
             var dispatcher = host.Services.GetRequiredService<IActionDispatcher>();
             dispatcher.Dispatch(new SetMessageAction("Message dispatched from Program.Main"));
 
-            dispatcher.Dispatch(new FireExceptionAction(false, true));
+            // choose where the exception should be thrown
+            dispatcher.Dispatch(new FireExceptionAction(false, false));
 
-            dispatcher.Dispatch(new SetMessageAction("!!!!Message after the exception action has been dispatched", source: "program"));
+            dispatcher.Dispatch(new SetMessageAction("Message after the exception action has been dispatched. Program flow should reach this point if any of the arguments was true", source: "program"));
 
             host.Dispose();
 
@@ -48,23 +49,16 @@ namespace ConsoleApp
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
                 {
-                    services
-                        .UseRedux<ApplicationState>()
-                        .UseDefaultDispatcher(options =>
-                        {
-                            options.Journaller = (IAction action) =>
+                    services.AddRedux<ApplicationState>(builder =>
+                    {
+                        builder.UseReducer(ApplicationReducer.Reduce)
+                            .AddEffects(Assembly.GetExecutingAssembly())
+                            .UseExceptionHandler(e =>
                             {
-                                Console.WriteLine($"Log: {action.GetType().Name}");
-                            };
-                        })
-                        .UseReducerFunc(ApplicationReducer.Reduce)
-                        .UseDefaultStateStream()
-                        .AddEffects(Assembly.GetExecutingAssembly())
-                        .UseExceptionHandler(e => {
-                            Console.WriteLine("Exception handler");
-                            Console.WriteLine(e.Message);
-                        })
-                        .Register();
+                                Console.WriteLine("Exception handler");
+                                Console.WriteLine(e.Message);
+                            });
+                    });
                 });
 
             return host;
