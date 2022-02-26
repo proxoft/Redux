@@ -12,7 +12,7 @@ namespace Proxoft.Redux.Core
         private readonly SubscriptionsManager _subscriptionsManager = new SubscriptionsManager();
         private readonly Subject<IAction> _actionsSubject = new Subject<IAction>();
 
-        public IObservable<IAction> Actions => _actionsSubject;
+        public IObservable<IAction> OutActions => _actionsSubject;
 
         protected IObservable<StateActionPair<TState>> StateActionStream { get; private set; } = Observable.Never<StateActionPair<TState>>();
 
