@@ -20,17 +20,14 @@ namespace BlazorApp.Client.Application.Forecasts
             _httpClient = httpClient;
         }
 
+        private IDisposable FetchDataEffect => this.ActionStream
+            .OfType<FetchWeatherForcastDataAction>()
+            .SelectAsync(action => this.FetchData(action))
+            .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data)));
+
         protected override IEnumerable<IDisposable> OnConnect()
         {
-            yield return this.FetchData(this.ActionStream);
-        }
-
-        private IDisposable FetchData(IObservable<IAction> actionStream)
-        {
-            return actionStream
-                .OfType<FetchWeatherForcastDataAction>()
-                .SelectAsync(action => this.FetchData(action))
-                .Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data)));
+            yield return this.FetchDataEffect;
         }
 
         private async Task<WeatherForecast[]> FetchData(FetchWeatherForcastDataAction action)
