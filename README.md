@@ -74,14 +74,14 @@ An IObservable\<ApplicationState> is a service responsible for pushing the state
 
 @code {
 	private IDisposable _subscription;
-    private CounterState _state = new ();
+	private CounterState _state = new ();
 	
 	[Inject]
-    public IObservable<ApplicationState> AppStream { get; set; }
-		
+	public IObservable<ApplicationState> AppStream { get; set; }
+
 	[Inject]
-    public IActionDispatcher Dispatcher { get; set; };
-	
+	public IActionDispatcher Dispatcher { get; set; };
+
 	private void OnClick()
 	{
 		this.Dispatcher.Dispatch(new IncreaseCounterAction(3));
@@ -91,15 +91,15 @@ An IObservable\<ApplicationState> is a service responsible for pushing the state
 	{
 		this.Dispatcher.Dispatch(new ResetCounterAction());
 	}
-	
+
 	protected override void OnInitialized()
 	{
 		base.OnInitialized();
 
 		_subscription = this.AppStream
-				.Select(a => a.Counter)
-				.DistinctUntilChanged()
-				.Subscribe(c => _state = c)
+			.Select(a => a.Counter)
+			.DistinctUntilChanged()
+			.Subscribe(c => _state = c)
 		);
 	}
 }
