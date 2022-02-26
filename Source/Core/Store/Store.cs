@@ -86,7 +86,7 @@ namespace Proxoft.Redux.Core
             }
 
             _effectsSubscription = Observable
-                .Merge(_effects.Select(e => e.Actions))
+                .Merge(_effects.Select(e => e.OutActions))
                 .Subscribe(a => _dispatcher.Dispatch(a));
 
             _dispatcher.Dispatch(DefaultActions.InitializeEffects);
