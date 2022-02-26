@@ -10,19 +10,6 @@ namespace Proxoft.Redux.Core.Dispatchers
         private readonly Subject<IAction> _dispatcher;
         private readonly IObservable<IAction> _observableDispatcher;
 
-        //public DefaultActionDispatcher() : this(_ => { }, Scheduler.CurrentThread)
-        //{
-        //}
-
-        //public DefaultActionDispatcher(Action<IAction> journaler) : this(journaler, Scheduler.CurrentThread)
-        //{
-        //}
-
-        //public DefaultActionDispatcher(IScheduler scheduler) : this(_ => { }, scheduler)
-        //{
-        //}
-
-        
         public DefaultActionDispatcher(
             IActionJournaler actionJournaler,
             IScheduler scheduler)
