@@ -9,11 +9,10 @@ namespace ConsoleApp.Application
 {
     public class ApplicationEffect : Effect<ApplicationState>
     {
-        protected override IEnumerable<IDisposable> OnConnect()
-        {
-            yield return this.ActionStream
+        private IObservable<IAction> Effect => this.ActionStream
                 .Where(action => action is not SetMessageAction ma || ma.Source != nameof(ApplicationEffect))
-                .Select(action => {
+                .Select(action =>
+                {
                     return action switch
                     {
                         InitializeAction _ => new SetMessageAction("From ApplicationEffect after InitializeEffect", nameof(ApplicationEffect)),
@@ -23,8 +22,11 @@ namespace ConsoleApp.Application
                         _ => DefaultActions.None
                     };
                 })
-                .Where(action => action != DefaultActions.None)
-                .Subscribe(a => this.Dispatch(a));
+                .Where(action => action != DefaultActions.None);
+
+        protected override IEnumerable<IDisposable> OnConnect()
+        {
+            yield return this.SubscribeDispatch(this.Effect);
         }
     }
 }
