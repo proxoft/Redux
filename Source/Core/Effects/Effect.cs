@@ -49,6 +49,11 @@ namespace Proxoft.Redux.Core
         {
         }
 
+        /// <summary>
+        /// Creates a subscription which dispatches the action(s) for all provided action streams.
+        /// </summary>
+        /// <param name="actionStreams">action streams</param>
+        /// <returns>Subscription instance.</returns>
         protected IDisposable SubscribeDispatch(params IObservable<IAction>[] actionStreams)
         {
             var subscription = actionStreams
@@ -58,6 +63,11 @@ namespace Proxoft.Redux.Core
             return subscription;
         }
 
+        /// <summary>
+        /// Creates a subscription which dispatches the action(s) for all provided action streams.
+        /// </summary>
+        /// <param name="actionStreams">action streams</param>
+        /// <returns>Subscription instance.</returns>
         protected IDisposable SubscribeDispatch(params IObservable<IAction[]>[] actionStreams)
         {
             var subscriptions = actionStreams
@@ -73,6 +83,11 @@ namespace Proxoft.Redux.Core
             return subscriptions;
         }
 
+        /// <summary>
+        /// Creates a subscription for all observables which don't dispatch any action
+        /// </summary>
+        /// <param name="sources">Streams.</param>
+        /// <returns>Subscription instance.</returns>
         protected IDisposable SubscribeNoDispatch(params IObservable<Unit>[] sources)
         {
             var subscription = sources
@@ -80,15 +95,6 @@ namespace Proxoft.Redux.Core
                 .Subscribe();
 
             return subscription;
-        }
-
-        protected void NoDispatch(params IObservable<Unit>[] dispatchStream)
-        {
-            foreach (var d in dispatchStream)
-            {
-                var s = d.Subscribe();
-                this.AddSubscriptions(s);
-            }
         }
 
         protected void AddSubscriptions(params IDisposable[] subscriptions)
