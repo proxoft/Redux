@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Proxoft.Redux.Core.Tools;
@@ -46,6 +47,48 @@ namespace Proxoft.Redux.Core
 
         protected virtual void OnDisconnect()
         {
+        }
+
+        protected IDisposable SubscribeDispatch(params IObservable<IAction>[] actionStreams)
+        {
+            var subscription = actionStreams
+                .Merge()
+                .Subscribe(this.Dispatch);
+
+            return subscription;
+        }
+
+        protected IDisposable SubscribeDispatch(params IObservable<IAction[]>[] actionStreams)
+        {
+            var subscriptions = actionStreams
+                .Merge()
+                .Subscribe(actions =>
+                {
+                    foreach (var action in actions)
+                    {
+                        this.Dispatch(action);
+                    }
+                });
+
+            return subscriptions;
+        }
+
+        protected IDisposable SubscribeNoDispatch(params IObservable<Unit>[] sources)
+        {
+            var subscription = sources
+                .Merge()
+                .Subscribe();
+
+            return subscription;
+        }
+
+        protected void NoDispatch(params IObservable<Unit>[] dispatchStream)
+        {
+            foreach (var d in dispatchStream)
+            {
+                var s = d.Subscribe();
+                this.AddSubscriptions(s);
+            }
         }
 
         protected void AddSubscriptions(params IDisposable[] subscriptions)
