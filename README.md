@@ -120,15 +120,11 @@ public class ForecastEffect : BaseApplicationEffect
 		_httpClient = httpClient;
 	}
 
-	private IDisposable FetchDataEffect => this.ActionStream
+    // effect is automatically subscribed and dispatches the resulting action
+	private IObservable<IAction> FetchDataEffect => this.ActionStream
 		.OfType<FetchWeatherForcastDataAction>()
 		.SelectAsync(action => this.FetchData(action))
-		.Subscribe(data => this.Dispatch(new SetWeatherForecastAction(data)));
-
-	protected override IEnumerable<IDisposable> OnConnect()
-	{
-		yield return this.FetchDataEffect;
-	}
+		.Select(data => new SetWeatherForecastAction(data));
 
 	private async Task<WeatherForecast[]> FetchData(FetchWeatherForcastDataAction action)
 	{
