@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using Proxoft.Redux.Core.Effects;
 using Proxoft.Redux.Core.Tools;
 
 namespace Proxoft.Redux.Core
@@ -121,7 +122,7 @@ namespace Proxoft.Redux.Core
 
         private IDisposable[] AutoSubscribe()
         {
-            var behavior = this.GetType().GetCustomAttribute<AutoSubscribeAttribute>() ?? new AutoSubscribeAttribute(false, false);
+            var behavior = this.GetType().GetCustomAttribute<AutoSubscribeAttribute>() ?? new AutoSubscribeAttribute();
 
             return this.SubscribeProperties(!behavior.Properties)
                 .Union(this.SubscribeMethods(!behavior.Methods))
@@ -130,23 +131,8 @@ namespace Proxoft.Redux.Core
 
         private IEnumerable<IDisposable> SubscribeProperties(bool optIn)
         {
-            var voids = this.GetType()
-                .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Where(x => x.PropertyType == typeof(IObservable<Unit>))
-                .Where(x => optIn
-                    ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
-                    : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<Unit>)x.GetValue(this)!)
-                .ToArray();
-
-            var actions = this.GetType()
-                .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Where(x => x.PropertyType.GetGenericArguments().SingleOrDefault(t => typeof(IAction).IsAssignableFrom(t)) != null)
-                .Where(x => optIn
-                    ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
-                    : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<IAction>)x.GetValue(this)!)
-                .ToArray();
+            var voids = this.GetObservableProperties<Unit>(optIn).ToArray();
+            var actions = this.GetObservableProperties<IAction>(optIn).ToArray();
 
             yield return this.SubscribeNoDispatch(voids);
             yield return this.SubscribeDispatch(actions);
@@ -154,31 +140,8 @@ namespace Proxoft.Redux.Core
 
         private IEnumerable<IDisposable> SubscribeMethods(bool optIn)
         {
-            var voids = this.GetType()
-                .GetMembers(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Where(x => x.MemberType == MemberTypes.Method)
-                .OfType<MethodInfo>()
-                .Where(x => !x.IsSpecialName)
-                .Where(x => x.ReturnType == typeof(IObservable<Unit>))
-                .Where(x => !x.GetParameters().Any())
-                .Where(x => optIn
-                    ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
-                    : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<Unit>)x.Invoke(this, Array.Empty<object?>())!)
-                .ToArray();
-
-            var actions = this.GetType()
-                .GetMembers(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Where(x => x.MemberType == MemberTypes.Method)
-                .OfType<MethodInfo>()
-                .Where(x => !x.IsSpecialName)
-                .Where(x => x.ReturnType.GetGenericArguments().SingleOrDefault(t => typeof(IAction).IsAssignableFrom(t)) != null)
-                .Where(x => !x.GetParameters().Any())
-                .Where(x => optIn
-                    ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
-                    : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<IAction>)x.Invoke(this, Array.Empty<object?>())!)
-                .ToArray();
+            var voids = this.GetObservableMethods<Unit>(optIn).ToArray();
+            var actions = this.GetObservableMethods<IAction>(optIn).ToArray();
 
             yield return this.SubscribeNoDispatch(voids);
             yield return this.SubscribeDispatch(actions);

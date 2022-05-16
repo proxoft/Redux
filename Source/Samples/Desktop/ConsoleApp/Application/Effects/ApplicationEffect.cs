@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
 using ConsoleApp.Application.Actions;
 using Proxoft.Redux.Core;
@@ -24,9 +25,8 @@ namespace ConsoleApp.Application
                 })
                 .Where(action => action != DefaultActions.None);
 
-        protected override IEnumerable<IDisposable> OnConnect()
-        {
-            yield return this.SubscribeDispatch(this.Effect);
-        }
+        private IObservable<Unit> NoDispacthEffect => this.ActionStream
+            .Do(action => Console.WriteLine($"Doing nothing, just logging {action}"))
+            .Select(_ => Unit.Default);
     }
 }
