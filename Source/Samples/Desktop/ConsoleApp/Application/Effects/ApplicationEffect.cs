@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using ConsoleApp.Application.Actions;
 using Proxoft.Redux.Core;
 using Proxoft.Redux.Core.Actions;
+using Proxoft.Redux.Core.Extensions;
 
 namespace ConsoleApp.Application
 {
@@ -27,6 +28,6 @@ namespace ConsoleApp.Application
 
         private IObservable<Unit> NoDispacthEffect => this.ActionStream
             .Do(action => Console.WriteLine($"Doing nothing, just logging {action}"))
-            .Select(_ => Unit.Default);
+            .SelectVoid();
     }
 }
