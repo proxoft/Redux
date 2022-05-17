@@ -27,6 +27,7 @@ namespace Proxoft.Redux.Core.Effects
                 .Where(x => x.MemberType == MemberTypes.Method)
                 .OfType<MethodInfo>()
                 .Where(x => !x.IsSpecialName)
+                .Where(x => !x.IsGenericMethod)
                 .Where(x => x.ReturnType.IsGenericType)
                 .Where(x => x.ReturnType.GetGenericTypeDefinition() == typeof(IObservable<>))
                 .Where(x => x.ReturnType.GetGenericArguments().SingleOrDefault(t => typeof(T).IsAssignableFrom(t)) != null)
