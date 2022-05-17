@@ -133,18 +133,22 @@ namespace Proxoft.Redux.Core
         {
             var voids = this.GetObservableProperties<Unit>(optIn).ToArray();
             var actions = this.GetObservableProperties<IAction>(optIn).ToArray();
+            var arrayActions = this.GetObservableProperties<IAction[]>(optIn).ToArray();
 
             yield return this.SubscribeNoDispatch(voids);
             yield return this.SubscribeDispatch(actions);
+            yield return this.SubscribeDispatch(arrayActions);
         }
 
         private IEnumerable<IDisposable> SubscribeMethods(bool optIn)
         {
             var voids = this.GetObservableMethods<Unit>(optIn).ToArray();
             var actions = this.GetObservableMethods<IAction>(optIn).ToArray();
+            var arrayActions = this.GetObservableMethods<IAction[]>(optIn).ToArray();
 
             yield return this.SubscribeNoDispatch(voids);
             yield return this.SubscribeDispatch(actions);
+            yield return this.SubscribeDispatch(arrayActions);
         }
     }
 }

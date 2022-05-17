@@ -42,6 +42,18 @@ namespace Tests
             Assert.Single(new TestClass().GetObservableMethods<object>(true));
         }
 
+        [Fact]
+        public void GetObservableProperty_OfArray()
+        {
+            Assert.Single(new TestClass2().GetObservableProperties<IAction[]>(false));
+            Assert.Empty(new TestClass2().GetObservableProperties<IAction>(false));
+        }
+
+        private class TestClass2
+        {
+            private IObservable<IAction[]> Property1 => new Subject<IAction[]>();
+        }
+
         private class TestClass
         {
             [Subscribe]
