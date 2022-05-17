@@ -11,7 +11,7 @@
         <Copyright>www.proxoft.sk</Copyright>
         <Product>Proxoft Redux</Product>
 
-        <Version>4.0.1</Version>
+        <Version>4.0.2</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/proxoft/Redux</PackageProjectUrl>
         <RepositoryUrl>https://github.com/proxoft/Redux</RepositoryUrl>
