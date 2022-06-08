@@ -25,11 +25,6 @@ namespace BlazorApp.Client.Application.Forecasts
             .SelectAsync(action => this.FetchData(action))
             .Select(data => new SetWeatherForecastAction(data));
 
-        protected override IEnumerable<IDisposable> OnConnect()
-        {
-            yield return this.SubscribeDispatch(this.FetchDataEffect);
-        }
-
         private async Task<WeatherForecast[]> FetchData(FetchWeatherForcastDataAction action)
         {
             try

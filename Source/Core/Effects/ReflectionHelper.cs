@@ -7,7 +7,7 @@ namespace Proxoft.Redux.Core.Effects
 {
     internal static class ReflectionHelper
     {
-        public static IEnumerable<IObservable<T>> GetObservableProperties<T>(this object self, bool optIn)
+        public static IEnumerable<Subscription<T>> GetObservableProperties<T>(this object self, bool optIn)
         {
             return self.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -17,10 +17,10 @@ namespace Proxoft.Redux.Core.Effects
                 .Where(x => optIn
                     ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
                     : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<T>)x.GetValue(self)!);
+                .Select(x => new Subscription<T>(x, (IObservable<T>)x.GetValue(self)!));
         }
 
-        public static IEnumerable<IObservable<T>> GetObservableMethods<T>(this object self, bool optIn)
+        public static IEnumerable<Subscription<T>> GetObservableMethods<T>(this object self, bool optIn)
         {
             return self.GetType()
                 .GetMembers(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -35,7 +35,7 @@ namespace Proxoft.Redux.Core.Effects
                 .Where(x => optIn
                     ? Attribute.IsDefined(x, typeof(SubscribeAttribute))
                     : !Attribute.IsDefined(x, typeof(IgnoreSubscribeAttribute)))
-                .Select(x => (IObservable<T>)x.Invoke(self, Array.Empty<object?>())!);
+                .Select(x => new Subscription<T>(x, (IObservable<T>)x.Invoke(self, Array.Empty<object?>())!));
         }
     }
 }
