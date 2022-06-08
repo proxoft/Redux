@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using Proxoft.Redux.Core.Effects;
+using Proxoft.Redux.Core.ExceptionHandling;
 using Proxoft.Redux.Core.Tools;
 
 namespace Proxoft.Redux.Core
@@ -60,6 +61,7 @@ namespace Proxoft.Redux.Core
         /// </summary>
         /// <param name="actionStreams">action streams</param>
         /// <returns>Subscription instance.</returns>
+        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
         protected IDisposable SubscribeDispatch(params IObservable<IAction>[] actionStreams)
         {
             var subscription = actionStreams
@@ -69,11 +71,21 @@ namespace Proxoft.Redux.Core
             return subscription;
         }
 
+        protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction>[] actionStreams)
+        {
+            var subscription = actionStreams
+                .Select(x => x.Observable
+                    .Subscribe(this.Dispatch, exception => throw new ReduxException(x, exception)));
+
+            return subscription;
+        }
+
         /// <summary>
         /// Creates a subscription which dispatches the action(s) for all provided action streams.
         /// </summary>
         /// <param name="actionStreams">action streams</param>
         /// <returns>Subscription instance.</returns>
+        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
         protected IDisposable SubscribeDispatch(params IObservable<IAction[]>[] actionStreams)
         {
             var subscriptions = actionStreams
@@ -89,16 +101,41 @@ namespace Proxoft.Redux.Core
             return subscriptions;
         }
 
+        protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction[]>[] actionStreams)
+        {
+            var subscriptions = actionStreams
+                .Select(x => x.Observable
+                    .Subscribe(actions =>
+                    {
+                        foreach (var action in actions)
+                        {
+                            this.Dispatch(action);
+                        }
+                    }, exception => throw new ReduxException(x, exception)));
+
+            return subscriptions;
+        }
+
         /// <summary>
         /// Creates a subscription for all observables which don't dispatch any action
         /// </summary>
         /// <param name="sources">Streams.</param>
         /// <returns>Subscription instance.</returns>
+        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
         protected IDisposable SubscribeNoDispatch(params IObservable<Unit>[] sources)
         {
             var subscription = sources
                 .Merge()
                 .Subscribe();
+
+            return subscription;
+        }
+
+        protected IEnumerable<IDisposable> SubscribeNoDispatch(params Subscription<Unit>[] sources)
+        {
+            var subscription = sources
+                .Select(x => x.Observable
+                    .Subscribe(unit => { }, exception => throw new ReduxException(x, exception)));
 
             return subscription;
         }
@@ -135,9 +172,9 @@ namespace Proxoft.Redux.Core
             var actions = this.GetObservableProperties<IAction>(optIn).ToArray();
             var arrayActions = this.GetObservableProperties<IAction[]>(optIn).ToArray();
 
-            yield return this.SubscribeNoDispatch(voids);
-            yield return this.SubscribeDispatch(actions);
-            yield return this.SubscribeDispatch(arrayActions);
+            return this.SubscribeNoDispatch(voids)
+                .Union(this.SubscribeDispatch(actions))
+                .Union(this.SubscribeDispatch(arrayActions));
         }
 
         private IEnumerable<IDisposable> SubscribeMethods(bool optIn)
@@ -146,9 +183,9 @@ namespace Proxoft.Redux.Core
             var actions = this.GetObservableMethods<IAction>(optIn).ToArray();
             var arrayActions = this.GetObservableMethods<IAction[]>(optIn).ToArray();
 
-            yield return this.SubscribeNoDispatch(voids);
-            yield return this.SubscribeDispatch(actions);
-            yield return this.SubscribeDispatch(arrayActions);
+            return this.SubscribeNoDispatch(voids)
+                .Union(this.SubscribeDispatch(actions))
+                .Union(this.SubscribeDispatch(arrayActions));
         }
     }
 }
