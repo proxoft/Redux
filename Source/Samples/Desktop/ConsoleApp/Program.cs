@@ -37,7 +37,7 @@ namespace ConsoleApp
 
             Console.WriteLine("Goodbye Redux");
 
-#if DEBUG
+#if !DEBUG
             Console.WriteLine("");
             Console.WriteLine("Press ENTER to end program...");
             Console.ReadLine();
