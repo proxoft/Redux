@@ -9,7 +9,7 @@ namespace Proxoft.Redux.Core
     {
         public Subscription(MemberInfo memberInfo, IObservable<T> observable) : base(memberInfo)
         {
-            Observable = observable.Do(_ => Debug.WriteLine($"Running from subscription {PropertyName}"));
+            this.Observable = observable;
         }
 
         public IObservable<T> Observable { get; }
@@ -19,9 +19,9 @@ namespace Proxoft.Redux.Core
     {
         public Subscription(MemberInfo memberInfo)
         {
-            PropertyName = memberInfo.Name;
-            ClassFullName = memberInfo.DeclaringType?.FullName ?? string.Empty;
-            ClassName = memberInfo.DeclaringType?.Name ?? string.Empty;
+            this.PropertyName = memberInfo.Name;
+            this.ClassFullName = memberInfo.DeclaringType?.FullName ?? string.Empty;
+            this.ClassName = memberInfo.DeclaringType?.Name ?? string.Empty;
         }
 
         public string PropertyName { get; }

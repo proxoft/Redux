@@ -27,8 +27,11 @@ namespace Proxoft.Redux.Core
         public void Connect(IObservable<StateActionPair<TState>> stateActionStream)
         {
             this.StateActionStream = stateActionStream;
-            var subscriptions = this.OnConnect().ToArray();
-            this.AddSubscriptions(AutoSubscribe());
+
+            var subscriptions = this.AutoSubscribe()
+                .Concat(this.OnConnect())
+                .ToArray();
+
             this.AddSubscriptions(subscriptions);
         }
 
@@ -74,8 +77,10 @@ namespace Proxoft.Redux.Core
         protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction>[] actionStreams)
         {
             var subscription = actionStreams
-                .Select(x => x.Observable
-                    .Subscribe(this.Dispatch, exception => throw new ReduxException(x, exception)));
+                .Select(x => x.Observable.Subscribe(
+                    this.Dispatch,
+                    exception => throw new ReduxException(x, exception))
+                );
 
             return subscription;
         }
@@ -104,14 +109,16 @@ namespace Proxoft.Redux.Core
         protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction[]>[] actionStreams)
         {
             var subscriptions = actionStreams
-                .Select(x => x.Observable
-                    .Subscribe(actions =>
+                .Select(x => x.Observable.Subscribe(
+                    actions =>
                     {
                         foreach (var action in actions)
                         {
                             this.Dispatch(action);
                         }
-                    }, exception => throw new ReduxException(x, exception)));
+                    },
+                    exception => throw new ReduxException(x, exception))
+                );
 
             return subscriptions;
         }
@@ -134,8 +141,10 @@ namespace Proxoft.Redux.Core
         protected IEnumerable<IDisposable> SubscribeNoDispatch(params Subscription<Unit>[] sources)
         {
             var subscription = sources
-                .Select(x => x.Observable
-                    .Subscribe(unit => { }, exception => throw new ReduxException(x, exception)));
+                .Select(x => x.Observable.Subscribe(
+                    unit => { },
+                    exception => throw new ReduxException(x, exception))
+                );
 
             return subscription;
         }
