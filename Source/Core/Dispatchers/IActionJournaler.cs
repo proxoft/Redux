@@ -4,6 +4,6 @@ namespace Proxoft.Redux.Core
 {
     public interface IActionJournaler
     {
-        void Journal(IAction action, Type? sender);
+        void Journal(IAction action, Type? sender = null);
     }
 }
