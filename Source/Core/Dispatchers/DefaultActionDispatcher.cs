@@ -7,22 +7,23 @@ namespace Proxoft.Redux.Core.Dispatchers
 {
     public class DefaultActionDispatcher : IActionDispatcher
     {
-        private readonly Subject<IAction> _dispatcher;
+        private readonly Subject<(Type?, IAction)> _dispatcher;
         private readonly IObservable<IAction> _observableDispatcher;
 
         public DefaultActionDispatcher(
             IActionJournaler actionJournaler,
             IScheduler scheduler)
         {
-            _dispatcher = new Subject<IAction>();
+            _dispatcher = new Subject<(Type?, IAction)>();
             _observableDispatcher = _dispatcher
-                .Do(action => actionJournaler.Journal(action))
+                .Do(action => actionJournaler.Journal(action.Item2, action.Item1))
+                .Select(x => x.Item2)
                 .ObserveOn(scheduler);
         }
 
-        public void Dispatch(IAction action)
+        public void Dispatch(IAction action, Type? sender = null)
         {
-            _dispatcher.OnNext(action);
+            _dispatcher.OnNext((sender, action));
         }
 
         public IDisposable Subscribe(IObserver<IAction> observer)

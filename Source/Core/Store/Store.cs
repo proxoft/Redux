@@ -78,7 +78,7 @@ namespace Proxoft.Redux.Core
                     e => _exceptionHandler.OnException(e)
                 );
 
-            _dispatcher.Dispatch(DefaultActions.Initialize);
+            _dispatcher.Dispatch(DefaultActions.Initialize, this.GetType());
 
             foreach (var e in _effects.OfType<IEffect<T>>())
             {
@@ -86,10 +86,10 @@ namespace Proxoft.Redux.Core
             }
 
             _effectsSubscription = Observable
-                .Merge(_effects.Select(e => e.OutActions))
-                .Subscribe(a => _dispatcher.Dispatch(a));
+                .Merge(_effects.Select(e => e.OutActions.CombineLatest(Observable.Return(e.GetType()))))
+                .Subscribe(a => _dispatcher.Dispatch(a.First, a.Second));
 
-            _dispatcher.Dispatch(DefaultActions.InitializeEffects);
+            _dispatcher.Dispatch(DefaultActions.InitializeEffects, this.GetType());
         }
     }
 }
