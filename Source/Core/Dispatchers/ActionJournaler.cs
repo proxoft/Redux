@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Proxoft.Redux.Core.Dispatchers
 {
@@ -13,7 +11,7 @@ namespace Proxoft.Redux.Core.Dispatchers
             _jornal = jornal;
         }
 
-        public void Journal(IAction action)
+        public void Journal(IAction action, Type? sender)
         {
             _jornal(action);
         }

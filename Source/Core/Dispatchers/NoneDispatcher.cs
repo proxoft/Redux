@@ -13,7 +13,7 @@ namespace Proxoft.Redux.Core.Dispatchers
         {
         }
 
-        public void Dispatch(IAction action)
+        public void Dispatch(IAction action, Type? sender)
         {
         }
 
