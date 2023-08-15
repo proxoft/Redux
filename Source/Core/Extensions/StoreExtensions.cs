@@ -23,7 +23,7 @@ namespace Proxoft.Redux.Core.Extensions
                 WhereStateAction(_ => true, actionPredicate);
         }
 
-        public static IObservable<(TS State, TA Action)> WhereActionOfType<TS, TA>(
+        public static IObservable<(TS State, TA Action)> WhereAction<TS, TA>(
             this IObservable<StateActionPair<TS>> source)
             where TA : IAction
         {
