@@ -68,8 +68,10 @@ namespace Proxoft.Redux.Core.Extensions
         {
             if (observable.Value.SequenceEqual(newValue))
             {
-                observable.OnNext(newValue);
+                return;
             }
+
+            observable.OnNext(newValue);
         }
 
         private static async Task<T> ExecuteTask<T>(T throughput, Func<T, Task> taskToExecute)
