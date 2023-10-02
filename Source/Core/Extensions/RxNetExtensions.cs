@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
 namespace Proxoft.Redux.Core.Extensions
@@ -59,6 +62,16 @@ namespace Proxoft.Redux.Core.Extensions
         {
             return source
                 .SelectAsync(s => ExecuteTask(s, taskFactory));
+        }
+
+        public static void OnNextWhenChanged<T>(this BehaviorSubject<IReadOnlyCollection<T>> observable, IReadOnlyCollection<T> newValue)
+        {
+            if (observable.Value.SequenceEqual(newValue))
+            {
+                return;
+            }
+
+            observable.OnNext(newValue);
         }
 
         private static async Task<T> ExecuteTask<T>(T throughput, Func<T, Task> taskToExecute)
