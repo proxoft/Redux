@@ -59,7 +59,7 @@ namespace Proxoft.Redux.Core
 
             _dispatcherSubscription = _dispatcher
                 .Scan(
-                    new StateActionPair<T>(init, default),
+                    new StateActionPair<T>(init, DefaultActions.None),
                     (acc, action) =>
                     {
                         var state = _reducer.Reduce(acc.State, action);
