@@ -48,7 +48,7 @@ namespace Proxoft.Redux.Core
             _dispatcherSubscription = null;
         }
 
-        public void Intialize(T initialState)
+        public void Initialize(T initialState)
             => this.Initialize(() => initialState);
 
         public void Initialize(Func<T> initialState)
