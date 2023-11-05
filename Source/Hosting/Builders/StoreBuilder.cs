@@ -33,20 +33,20 @@ public partial class StoreBuilder<TState>
     }
 
     private ServiceDescriptor ToServiceDescriptor<TService>()
-        => new ServiceDescriptor(typeof(TService), typeof(TService), _serviceLifetime);
+        => new(typeof(TService), typeof(TService), _serviceLifetime);
 
     private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>() where TImplementation : TService
-        => new ServiceDescriptor(typeof(TService), typeof(TImplementation), _serviceLifetime);
+        => new(typeof(TService), typeof(TImplementation), _serviceLifetime);
 
     private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(Func<IServiceProvider, TImplementation> resolve) where TImplementation : class, TService
-        => new ServiceDescriptor(typeof(TService), resolve, _serviceLifetime);
+        => new(typeof(TService), resolve, _serviceLifetime);
 
     private ServiceDescriptor ToServiceDescriptor<TService, TImplementation>(TImplementation instance) where TImplementation : TService
-        => new ServiceDescriptor(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
+        => new(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
 
     private ServiceDescriptor ToServiceDescriptor<TService>(TService instance)
-       => new ServiceDescriptor(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
+       => new(typeof(TService), sp => instance ?? throw new Exception("cannot be null"), _serviceLifetime);
 
     private ServiceDescriptor ToServiceDescriptor<TService>(Type implementation)
-        => new ServiceDescriptor(typeof(TService), implementation, _serviceLifetime);
+        => new(typeof(TService), implementation, _serviceLifetime);
 }

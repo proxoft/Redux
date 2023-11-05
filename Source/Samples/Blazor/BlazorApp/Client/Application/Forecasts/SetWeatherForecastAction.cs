@@ -4,12 +4,7 @@ using Proxoft.Redux.Core;
 
 namespace Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
 
-public class SetWeatherForecastAction : IAction
+public class SetWeatherForecastAction(IReadOnlyCollection<WeatherForecast> weatherForecasts) : IAction
 {
-    public SetWeatherForecastAction(IReadOnlyCollection<WeatherForecast> weatherForecasts)
-    {
-        this.WeatherForecasts = weatherForecasts;
-    }
-
-    public IReadOnlyCollection<WeatherForecast> WeatherForecasts { get; }
+    public IReadOnlyCollection<WeatherForecast> WeatherForecasts { get; } = weatherForecasts;
 }

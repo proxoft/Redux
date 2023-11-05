@@ -10,7 +10,7 @@ namespace Proxoft.Redux.BlazorApp.Client.Pages;
 
 public class ClientBasePage : ComponentBase, IDisposable
 {
-    private SubscriptionsManager _sm = new();
+    private readonly SubscriptionsManager _sm = new();
 
     [Inject]
     public IObservable<ApplicationState> AppStream { get; set; } = Observable.Never<ApplicationState>();
@@ -21,6 +21,7 @@ public class ClientBasePage : ComponentBase, IDisposable
     public void Dispose()
     {
         _sm.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     protected void AddSubscriptions(params IDisposable[] subscriptions)

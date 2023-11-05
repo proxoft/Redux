@@ -8,6 +8,8 @@ using Xunit;
 
 namespace Proxoft.Redux.Core.Tests.Effects;
 
+#pragma warning disable CA1822 // Mark members as static
+
 public class ReflectionHelperTests
 {
     [Fact]
@@ -73,8 +75,10 @@ public class ReflectionHelperTests
         private IObservable<IAction> Method3() => new Subject<IAction>();
 
         private IObservable<TAction> GenericMethod<TAction>() where TAction : IAction
+
         {
             return new Subject<TAction>();
         }
     }
 }
+#pragma warning restore CA1822 // Mark members as static

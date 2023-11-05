@@ -2,12 +2,7 @@
 
 namespace Proxoft.Redux.BlazorApp.Client.Application.Counters;
 
-public class IncreaseCounterAction : IAction
+public class IncreaseCounterAction(int byValue) : IAction
 {
-    public IncreaseCounterAction(int byValue)
-    {
-        this.ByValue = byValue;
-    }
-
-    public int ByValue { get; }
+    public int ByValue { get; } = byValue;
 }

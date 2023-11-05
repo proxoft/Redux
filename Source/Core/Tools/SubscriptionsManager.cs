@@ -5,7 +5,7 @@ namespace Proxoft.Redux.Core.Tools
 {
     public sealed class SubscriptionsManager: IDisposable
     {
-        private readonly List<IDisposable> _subscriptions = new List<IDisposable>();
+        private readonly List<IDisposable> _subscriptions = [];
 
         public void AddSubscriptions(params IDisposable[] subscriptions)
         {

@@ -11,14 +11,9 @@ using Proxoft.Redux.Core.Extensions;
 
 namespace Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
 
-public class ForecastEffect : BaseApplicationEffect
+public class ForecastEffect(HttpClient httpClient) : BaseApplicationEffect
 {
-    private readonly HttpClient _httpClient;
-
-    public ForecastEffect(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    private readonly HttpClient _httpClient = httpClient;
 
     private IObservable<IAction> FetchDataEffect => this.ActionStream
         .OfType<FetchWeatherForcastDataAction>()
@@ -30,13 +25,13 @@ public class ForecastEffect : BaseApplicationEffect
         try
         {
             var data = await _httpClient.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast")
-                ?? Array.Empty<WeatherForecast>();
+                ?? [];
 
             return data;
         }
         catch
         {
-            return Array.Empty<WeatherForecast>();
+            return [];
         }
     }
 }

@@ -3,14 +3,9 @@ using Proxoft.Redux.Core.Guards;
 
 namespace Proxoft.Redux.Hosting.Builders;
 
-internal sealed class FuncGuard<TState> : IGuard<TState>
+internal sealed class FuncGuard<TState>(Func<IAction, TState, IAction> guardFunc) : IGuard<TState>
 {
-    private readonly Func<IAction, TState, IAction> _guardFunc;
-
-    public FuncGuard(Func<IAction, TState, IAction> guardFunc)
-    {
-        _guardFunc = guardFunc;
-    }
+    private readonly Func<IAction, TState, IAction> _guardFunc = guardFunc;
 
     public IAction Validate(IAction action, TState state)
     {

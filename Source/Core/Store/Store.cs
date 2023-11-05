@@ -10,38 +10,27 @@ using Proxoft.Redux.Core.Guards;
 
 namespace Proxoft.Redux.Core;
 
-public sealed class Store<T>: IDisposable
+public sealed class Store<T>(
+    IActionDispatcher dispatcher,
+    IReducer<T> reducer,
+    IGuard<T> guard,
+    IStateStreamSubject<T> stateStreamSubject,
+    IEnumerable<IEffect<T>> effects,
+    IExceptionHandler exceptionHandler,
+    ILogger<Store<T>> logger) : IDisposable
 {
     private readonly Subject<StateActionPair<T>> _effectStream = new();
 
-    private readonly IActionDispatcher _dispatcher;
-    private readonly IReducer<T> _reducer;
-    private readonly IStateStreamSubject<T> _stateStreamSubject;
-    private readonly IEnumerable<IEffect<T>> _effects;
-    private readonly IGuard<T> _guard;
-    private readonly IExceptionHandler _exceptionHandler;
-    private readonly ILogger<Store<T>> _logger;
+    private readonly IActionDispatcher _dispatcher = dispatcher;
+    private readonly IReducer<T> _reducer = reducer;
+    private readonly IStateStreamSubject<T> _stateStreamSubject = stateStreamSubject;
+    private readonly IEnumerable<IEffect<T>> _effects = effects.ToArray();
+    private readonly IGuard<T> _guard = guard;
+    private readonly IExceptionHandler _exceptionHandler = exceptionHandler;
+    private readonly ILogger<Store<T>> _logger = logger;
 
     private IDisposable? _dispatcherSubscription;
     private IDisposable? _effectsSubscription;
-
-    public Store(
-        IActionDispatcher dispatcher,
-        IReducer<T> reducer,
-        IGuard<T> guard,
-        IStateStreamSubject<T> stateStreamSubject,
-        IEnumerable<IEffect<T>> effects,
-        IExceptionHandler exceptionHandler,
-        ILogger<Store<T>> logger)
-    {
-        _dispatcher = dispatcher;
-        _reducer = reducer;
-        _stateStreamSubject = stateStreamSubject;
-        _effects = effects.ToArray();
-        _guard = guard;
-        _exceptionHandler = exceptionHandler;
-        _logger = logger;
-    }
 
     public void Initialize(T initialState)
         => this.Initialize(() => initialState);
