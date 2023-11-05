@@ -26,7 +26,7 @@ namespace ConsoleApp.Application
                 })
                 .Where(action => action != DefaultActions.None);
 
-        private IObservable<Unit> NoDispacthEffect => this.ActionStream
+        private IObservable<Unit> NoDispatchEffect => this.ActionStream
             .Do(action => Console.WriteLine($"Doing nothing, just logging {action}"))
             .SelectVoid();
     }

@@ -1,7 +1,9 @@
 ﻿<Project>
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
 
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -17,4 +19,8 @@
         <RepositoryUrl>https://github.com/proxoft/Redux</RepositoryUrl>
         <PackageTags>Redux;State Management</PackageTags>
     </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    </ItemGroup>
 </Project>

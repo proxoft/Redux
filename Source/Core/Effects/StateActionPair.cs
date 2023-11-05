@@ -1,14 +1,3 @@
-﻿namespace Proxoft.Redux.Core
-{
-    public class StateActionPair<T>
-    {
-        public StateActionPair(T state, IAction action)
-        {
-            this.State = state;
-            this.Action = action;
-        }
+﻿namespace Proxoft.Redux.Core;
 
-        public T State { get; }
-        public IAction Action { get; }
-    }
-}
+public sealed record StateActionPair<T>(T State, IAction Action);

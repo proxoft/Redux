@@ -14,6 +14,14 @@ namespace ConsoleApp.Application
                 InitializeEffectsAction _ => state with { Message = "Initialize Effects Action executed"},
                 SetMessageAction messageAction => state with { Message = messageAction.Message },
                 FireExceptionAction e when e.InReducer => throw new System.Exception("Exception thrown in reducer on behalf of action"),
+                GuardedAction => state with
+                {
+                    GuardedActionsCount = state.GuardedActionsCount + 1
+                },
+                ResetGuardedAction => state with
+                {
+                    GuardedActionsCount = 0
+                },
                 _ => state
             };
         }

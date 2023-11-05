@@ -3,93 +3,122 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using Proxoft.Redux.Core.Actions;
 using Proxoft.Redux.Core.ExceptionHandling;
+using Proxoft.Redux.Core.Guards;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public sealed class Store<T>: IDisposable
 {
-    public sealed class Store<T>: IDisposable
+    private readonly Subject<StateActionPair<T>> _effectStream = new();
+
+    private readonly IActionDispatcher _dispatcher;
+    private readonly IReducer<T> _reducer;
+    private readonly IStateStreamSubject<T> _stateStreamSubject;
+    private readonly IEnumerable<IEffect<T>> _effects;
+    private readonly IGuard<T> _guard;
+    private readonly IExceptionHandler _exceptionHandler;
+    private readonly ILogger<Store<T>> _logger;
+
+    private IDisposable? _dispatcherSubscription;
+    private IDisposable? _effectsSubscription;
+
+    public Store(
+        IActionDispatcher dispatcher,
+        IReducer<T> reducer,
+        IGuard<T> guard,
+        IStateStreamSubject<T> stateStreamSubject,
+        IEnumerable<IEffect<T>> effects,
+        IExceptionHandler exceptionHandler,
+        ILogger<Store<T>> logger)
     {
-        private readonly IActionDispatcher _dispatcher;
-        private readonly IReducer<T> _reducer;
-        private readonly IStateStreamSubject<T> _stateStreamSubject;
-        private readonly IEnumerable<IEffect<T>> _effects;
-        private readonly Subject<StateActionPair<T>> _effectStream = new Subject<StateActionPair<T>>();
-        private readonly IExceptionHandler _exceptionHandler;
+        _dispatcher = dispatcher;
+        _reducer = reducer;
+        _stateStreamSubject = stateStreamSubject;
+        _effects = effects.ToArray();
+        _guard = guard;
+        _exceptionHandler = exceptionHandler;
+        _logger = logger;
+    }
 
-        private IDisposable? _dispatcherSubscription;
-        private IDisposable? _effectsSubscription;
+    public void Initialize(T initialState)
+        => this.Initialize(() => initialState);
 
-        public Store(
-            IActionDispatcher dispatcher,
-            IReducer<T> reducer,
-            IStateStreamSubject<T> stateStreamSubject,
-            IEnumerable<IEffect<T>> effects,
-            IExceptionHandler exceptionHandler)
-        {
-            _dispatcher = dispatcher;
-            _reducer = reducer;
-            _stateStreamSubject = stateStreamSubject;
-            _effects = effects;
-            _exceptionHandler = exceptionHandler;
-        }
+    public void Initialize(Func<T> initialState)
+    {
+        var init = initialState();
 
-        public void Dispose()
-        {
-            foreach(var e in _effects)
-            {
-                e.Disconnect();
-            }
+        _stateStreamSubject.OnNext(init);
 
-            _effectsSubscription?.Dispose();
-            _effectsSubscription = null;
-
-            _dispatcherSubscription?.Dispose();
-            _dispatcherSubscription = null;
-        }
-
-        public void Initialize(T initialState)
-            => this.Initialize(() => initialState);
-
-        public void Initialize(Func<T> initialState)
-        {
-            var init = initialState();
-
-            _stateStreamSubject.OnNext(init);
-
-            _dispatcherSubscription = _dispatcher
-                .Scan(
-                    new StateActionPair<T>(init, DefaultActions.None),
-                    (acc, action) =>
-                    {
-                        var state = _reducer.Reduce(acc.State, action);
-                        return new StateActionPair<T>(state, action);
-                    })
-                .Do(pair =>
+        _dispatcherSubscription = _dispatcher
+            .Where(action => action != DefaultActions.None)
+            .Scan(
+                new StateActionPair<T>(init, DefaultActions.None),
+                (acc, action) =>
                 {
-                    _stateStreamSubject.OnNext(pair.State);
-                    _effectStream.OnNext(pair);
-                })
-                .Subscribe(
-                    pair =>
+                    IAction guardedAction = _guard.Validate(action, acc.State);
+                    if(guardedAction != action)
                     {
-                        // eventually do (debug) log
-                    },
-                    e => _exceptionHandler.OnException(e)
-                );
+                        _logger.LogDebug($"action {action} changed to {guardedAction}");
+                    }
 
-            _dispatcher.Dispatch(DefaultActions.Initialize, this.GetType());
+                    if(guardedAction == DefaultActions.None)
+                    {
+                        return acc;
+                    }
 
-            foreach (var e in _effects.OfType<IEffect<T>>())
+                    var state = _reducer.Reduce(acc.State, guardedAction);
+                    return new StateActionPair<T>(state, guardedAction);
+                })
+            .DistinctUntilChanged()
+            .Do(pair =>
             {
-                e.Connect(_effectStream);
-            }
+                _stateStreamSubject.OnNext(pair.State);
+                _effectStream.OnNext(pair);
+            })
+            .Subscribe(
+                pair =>
+                {
+                    _logger.LogTrace($"{pair}");
+                },
+                e =>
+                {
+                    _logger.LogError(e, "unexpected error occurred in Store pipeline");
+                    _exceptionHandler.OnException(e);
+                },
+                () =>
+                {
+                    _logger.LogDebug("store was completed");
+                }
+            );
 
-            _effectsSubscription = Observable
-                .Merge(_effects.Select(e => e.OutActions.CombineLatest(Observable.Return(e.GetType()))))
-                .Subscribe(a => _dispatcher.Dispatch(a.First, a.Second));
+        _dispatcher.Dispatch(DefaultActions.Initialize, this.GetType());
 
-            _dispatcher.Dispatch(DefaultActions.InitializeEffects, this.GetType());
+        foreach (var e in _effects.OfType<IEffect<T>>())
+        {
+            e.Connect(_effectStream);
         }
+
+        _effectsSubscription = Observable
+            .Merge(_effects.Select(e => e.OutActions.CombineLatest(Observable.Return(e.GetType()))))
+            .Subscribe(a => _dispatcher.Dispatch(a.First, a.Second));
+
+        _dispatcher.Dispatch(DefaultActions.InitializeEffects, this.GetType());
+    }
+
+    public void Dispose()
+    {
+        foreach (var e in _effects)
+        {
+            e.Disconnect();
+        }
+
+        _effectsSubscription?.Dispose();
+        _effectsSubscription = null;
+
+        _dispatcherSubscription?.Dispose();
+        _dispatcherSubscription = null;
     }
 }

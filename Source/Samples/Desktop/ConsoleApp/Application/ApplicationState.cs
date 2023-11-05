@@ -1,7 +1,8 @@
-﻿namespace ConsoleApp.Application
+﻿namespace ConsoleApp.Application;
+
+public record ApplicationState
 {
-    public record ApplicationState
-    {
-        public string Message { get; init; } = "";
-    }
+    public int GuardedActionsCount { get; init; }
+
+    public string Message { get; init; } = "";
 }
