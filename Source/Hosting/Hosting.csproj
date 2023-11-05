@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace>Proxoft.Redux.Hosting</RootNamespace>
-        <AssemblyName>Proxoft.Redux.Hosting</AssemblyName>
         <Description>services
     .UseRedux&lt;ApplicationState&gt;()
     .UseDefaultDispatcher()

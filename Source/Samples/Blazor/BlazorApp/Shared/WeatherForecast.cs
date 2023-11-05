@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlazorApp.Shared;
+namespace Proxoft.Redux.BlazorApp.Shared;
 
 public class WeatherForecast
 {

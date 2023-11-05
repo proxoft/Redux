@@ -1,8 +1,7 @@
 ﻿using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application.Forecasts
+namespace Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
+
+public class FetchWeatherForcastDataAction : IAction
 {
-    public class FetchWeatherForcastDataAction : IAction
-    {
-    }
 }

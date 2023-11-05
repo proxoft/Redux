@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace BlazorApp.Server
+namespace Proxoft.Redux.BlazorApp.Server
 {
     public class Program
     {

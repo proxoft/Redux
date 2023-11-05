@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace>Proxoft.Redux.Core.Tests</RootNamespace>
-        <AssemblyName>Proxoft.Redux.Core.Tests</AssemblyName>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>

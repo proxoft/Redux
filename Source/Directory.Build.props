@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>latest</LangVersion>
 
+        <AssemblyName>Proxoft.Redux.$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>Proxoft.Redux.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+        
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 

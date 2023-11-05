@@ -1,13 +1,12 @@
 ﻿using Proxoft.Redux.Core.ExceptionHandling;
 using System;
 
-namespace BlazorApp.Client
+namespace Proxoft.Redux.BlazorApp.Client;
+
+public class StoreExceptionHandler : IExceptionHandler
 {
-    public class StoreExceptionHandler : IExceptionHandler
+    public void OnException(Exception exception)
     {
-        public void OnException(Exception exception)
-        {
-            Console.WriteLine(exception.ToString());
-        }
+        Console.WriteLine(exception.ToString());
     }
 }
