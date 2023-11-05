@@ -1,7 +1,6 @@
-﻿namespace Proxoft.Redux.Core.Actions
+﻿namespace Proxoft.Redux.Core.Actions;
+
+public sealed class InitializeAction : IAction
 {
-    public class InitializeAction : IAction
-    {
-        internal InitializeAction() { }
-    }
+    internal InitializeAction() { }
 }

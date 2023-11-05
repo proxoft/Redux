@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public interface IEffect<TState> : IDisposable
 {
-    public interface IEffect<TState> : IDisposable
-    {
-        IObservable<IAction> OutActions { get; }
+    IObservable<IAction> OutActions { get; }
 
-        void Connect(IObservable<StateActionPair<TState>> stateActionStream);
+    void Connect(IObservable<StateActionPair<TState>> stateActionStream);
 
-        void Disconnect();
-    }
+    void Disconnect();
 }

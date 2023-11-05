@@ -1,7 +1,6 @@
-﻿namespace Proxoft.Redux.Core
+﻿namespace Proxoft.Redux.Core;
+
+public interface IReducer<T>
 {
-    public interface IReducer<T>
-    {
-        T Reduce(T state, IAction action);
-    }
+    T Reduce(T state, IAction action);
 }

@@ -1,7 +1,6 @@
-﻿namespace Proxoft.Redux.Core.Actions
+﻿namespace Proxoft.Redux.Core.Actions;
+
+public sealed class InitializeEffectsAction : IAction
 {
-    public class InitializeEffectsAction : IAction
-    {
-        internal InitializeEffectsAction() { }
-    }
+    internal InitializeEffectsAction() { }
 }
