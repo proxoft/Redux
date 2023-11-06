@@ -1,5 +1,6 @@
 # Redux for .NET
-Predictable state management.
+Predictable state container for .NET C#. Inspired by ngrx library. This library is tightly connected to System.Reactive library.
+
 The Redux is composed of logical components
 1. State - immutable state without any logic
 2. Action - a command or even which triggers changes on state
@@ -12,7 +13,9 @@ All of these are orchestrated by Store
 
 ### Define components
 
-1. Create 'State' 
+#### State
+The state is an object containing all the application data. It may be of any type (class, record, struct, primitive). The important part about it is that the state should be immutable (or it must be used as it was immutable).
+That means: any time a state needs to be changed a new instance with modified data must be created.
 
 ```csharp
 public record ApplicationState
@@ -21,7 +24,9 @@ public record ApplicationState
 }
 ```
 
-2. Create 'Actions'
+#### Actions
+*Actions* are commands or events containing information (name of the action and optionally other data in the action) sent from your application to your *store*. 
+They only need to implement the markup interface Redux.IAction.
 
 ```csharp
 public class SetMessageAction : IAction
@@ -43,7 +48,11 @@ public class ResetMessageAction : IAction
 }
 ```
 
-3. Create 'Reducer'
+#### Reducers
+A *reducer* is a [pure function](https://en.wikipedia.org/wiki/Pure_function) with ((TState)state, (IAction)action) => (TState)state signature.
+The reducer transform current state into the next state according to action by creating a new instance with modified data.
+The *pure function* requirement implies that the reducer cannot habe any side-effect (e.g. persisting state, fetching data from another service).
+The reason is that the reducer must be predictable: it must always behave the same way and its behavior (result) depends only on input arguments.
 
 ```csharp
 public static class ApplicationReducer
@@ -60,7 +69,9 @@ public static class ApplicationReducer
 }
 ```
 
-4. Create 'Effect'
+#### Effect
+The Effect is a construct for all side-effects e.g. fetching data from REST, saving data to DB, execution of asynchronous tasks, etc.
+Effect may observe actions, state or both and execute corresponding actions. It also may dispatch new actions.
 
 ```csharp
 public class ApplicationEffect : Effect<ApplicationState>
@@ -72,7 +83,15 @@ public class ApplicationEffect : Effect<ApplicationState>
 }
 ```
 
-### Create Store
+
+#### Store
+
+The Store\<TState> wires it all together. It
+* Holds application state of type TState.
+* Executes reducers any time an action is dispatched via ActionDispatcher.
+* Publishes update state
+* Publishes actions and updated states to the effect
+
 ```csharp
 
 Store store = StoreHelper.Create(ApplicationReducer.Reduce, effects: new ApplicationEffect());
@@ -82,7 +101,7 @@ store.Dispatchar.Dispatch(new TriggerAction());
 
 ```
 
-### Use the store
+#### Use the store
 
 Dispatch actions
 
@@ -106,7 +125,7 @@ store.StateStream
 
 ```
 
-## Registering services
+#### Builder
 use the proxoft.redux.hosting package
 
 ```csharp
