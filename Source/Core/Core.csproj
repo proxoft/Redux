@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Description>Implementation of Redux for .NET</Description>
         <PackageIcon>Icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +23,10 @@
       <None Include="..\Icons\Icon.png">
         <Pack>True</Pack>
         <PackagePath></PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
       </None>
     </ItemGroup>
 

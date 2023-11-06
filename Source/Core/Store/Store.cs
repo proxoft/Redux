@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Proxoft.Redux.Core.Actions;
+using Proxoft.Redux.Core.Dispatchers;
 using Proxoft.Redux.Core.ExceptionHandling;
 using Proxoft.Redux.Core.Guards;
 
@@ -31,6 +33,10 @@ public sealed class Store<T>(
 
     private IDisposable? _dispatcherSubscription;
     private IDisposable? _effectsSubscription;
+
+    public IActionDispatcher Dispatcher => _dispatcher;
+
+    public IStateStream<T> StateStream => _stateStreamSubject;
 
     public void Initialize(T initialState)
         => this.Initialize(() => initialState);
@@ -109,5 +115,87 @@ public sealed class Store<T>(
 
         _dispatcherSubscription?.Dispose();
         _dispatcherSubscription = null;
+    }
+}
+
+public static class StoreHelper
+{
+    public static Store<TState> Create<TState>(
+        IReducer<TState> reducer,
+        IExceptionHandler? exceptionHandler = null,
+        ILogger<Store<TState>>? logger = null,
+        params IEffect<TState>[] effects)
+    {
+        return Create(
+            reducer,
+            exceptionHandler: exceptionHandler,
+            logger: logger,
+            effects: effects
+        );
+    }
+
+    public static Store<TState> Create<TState>(
+        Func<TState, IAction, TState> reducer,
+        IExceptionHandler? exceptionHandler = null,
+        ILogger<Store<TState>>? logger = null,
+        params IEffect<TState>[] effects)
+    {
+        return Create(
+            new FuncReducer<TState>(reducer),
+            exceptionHandler: exceptionHandler,
+            logger: logger,
+            effects: effects);
+    }
+
+    public static Store<TState> Create<TState>(
+        IReducer<TState> reducer,
+        Func<IAction, TState, IAction> guard,
+        IExceptionHandler? exceptionHandler = null,
+        ILogger<Store<TState>>? logger = null,
+        params IEffect<TState>[] effects)
+    {
+        return Create(
+            reducer,
+            guard: new FuncGuard<TState>(guard),
+            exceptionHandler: exceptionHandler,
+            logger: logger,
+            effects: effects);
+    }
+
+
+    public static Store<TState> Create<TState>(
+        Func<TState, IAction, TState> reducer,
+        Func<IAction, TState, IAction> guard,
+        IExceptionHandler? exceptionHandler = null,
+        ILogger<Store<TState>>? logger = null,
+        params IEffect<TState>[] effects)
+    {
+        return Create(
+            new FuncReducer<TState>(reducer),
+            guard: new FuncGuard<TState>(guard),
+            exceptionHandler: exceptionHandler,
+            logger: logger,
+            effects: effects);
+    }
+
+    public static Store<TState> Create<TState>(
+        IReducer<TState> reducer,
+        IGuard<TState>? guard = null,
+        IExceptionHandler? exceptionHandler = null,
+        ILogger<Store<TState>>? logger = null,
+        params IEffect<TState>[] effects)
+    {
+        DefaultActionDispatcher dispatcher = DefaultActionDispatcher.Create();
+        DefaultStateStream<TState> stateStreamSubject = new();
+
+        return new Store<TState>(
+            dispatcher,
+            reducer,
+            guard ?? new NoGuard<TState>(),
+            stateStreamSubject,
+            effects,
+            exceptionHandler ?? new ActionExceptionHandler(ex => throw ex),
+            logger ?? NullLogger<Store<TState>>.Instance
+        );
     }
 }

@@ -28,4 +28,9 @@ public class DefaultActionDispatcher : IActionDispatcher
 
     public IDisposable Subscribe(IObserver<IAction> observer)
         => _observableDispatcher.Subscribe(observer);
+
+    public static DefaultActionDispatcher Create()
+    {
+        return new DefaultActionDispatcher(new ActionJournaler(_ => { }), Scheduler.CurrentThread);
+    }
 }

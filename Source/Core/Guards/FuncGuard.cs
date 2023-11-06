@@ -1,9 +1,9 @@
 ﻿using Proxoft.Redux.Core;
 using Proxoft.Redux.Core.Guards;
 
-namespace Proxoft.Redux.Hosting.Builders;
+namespace Proxoft.Redux.Core.Guards;
 
-internal sealed class FuncGuard<TState>(Func<IAction, TState, IAction> guardFunc) : IGuard<TState>
+public sealed class FuncGuard<TState>(Func<IAction, TState, IAction> guardFunc) : IGuard<TState>
 {
     private readonly Func<IAction, TState, IAction> _guardFunc = guardFunc;
 

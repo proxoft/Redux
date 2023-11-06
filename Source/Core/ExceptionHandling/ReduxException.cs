@@ -2,13 +2,8 @@
 
 namespace Proxoft.Redux.Core.ExceptionHandling;
 
-public class ReduxException : Exception
+public class ReduxException(Subscription subscription, Exception e) : Exception(CreateMessage(subscription), e)
 {
-    public ReduxException(Subscription subscription, Exception e)
-    : base(CreateMessage(subscription), e)
-    {
-    }
-
     private static string CreateMessage(Subscription subscription)
     {
         return

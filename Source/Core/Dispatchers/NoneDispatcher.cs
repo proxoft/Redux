@@ -5,9 +5,9 @@ namespace Proxoft.Redux.Core.Dispatchers;
 
 public class NoneDispatcher : IActionDispatcher
 {
-    public static NoneDispatcher Instance = new NoneDispatcher();
+    public static readonly NoneDispatcher Instance = new();
 
-    private IObservable<IAction> _never = Observable.Never<IAction>();
+    private readonly IObservable<IAction> _never = Observable.Never<IAction>();
 
     private NoneDispatcher()
     {

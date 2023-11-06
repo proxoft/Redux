@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>services
-    .UseRedux&lt;ApplicationState&gt;()
-    .UseDefaultDispatcher()
-    .UseReducerFunc(ApplicationReducer.Reduce)
-    .UseDefaultStateStream()
-    .AddEffects(Assembly.GetExecutingAssembly())
-    .Register();
+        <Description>
+            Convenient way to conifgure and register all the Redux components in the DI.
         </Description>
         <PackageIcon>Icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,6 +25,10 @@
       <None Include="..\Icons\Icon.png">
         <Pack>True</Pack>
         <PackagePath></PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
       </None>
     </ItemGroup>
 

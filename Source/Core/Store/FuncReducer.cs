@@ -1,9 +1,8 @@
 ﻿using System;
-using Proxoft.Redux.Core;
 
-namespace Proxoft.Redux.Hosting.Builders;
+namespace Proxoft.Redux.Core;
 
-internal class FuncReducer<TState>(Func<TState, IAction, TState> func) : IReducer<TState>
+public class FuncReducer<TState>(Func<TState, IAction, TState> func) : IReducer<TState>
 {
     private readonly Func<TState, IAction, TState> _func = func;
 
