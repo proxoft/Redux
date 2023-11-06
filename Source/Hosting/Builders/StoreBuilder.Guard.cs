@@ -15,13 +15,13 @@ public partial class StoreBuilder<TState>
     private ServiceDescriptor _guardServiceDescriptor = null!;
 
     public StoreBuilder<TState> AddGuard<TGuard>()
-        where TGuard : IGuard<TState>
+        where TGuard : IActionGuard<TState>
     {
-        _guardServiceDescriptor = this.ToServiceDescriptor<IGuard<TState>,TGuard >();
+        _guardServiceDescriptor = this.ToServiceDescriptor<IActionGuard<TState>,TGuard >();
         return this;
     }
 
-    public StoreBuilder<TState> AddGuard(IGuard<TState> guard)
+    public StoreBuilder<TState> AddGuard(IActionGuard<TState> guard)
     {
         _guardServiceDescriptor = this.ToServiceDescriptor(guard);
         return this;

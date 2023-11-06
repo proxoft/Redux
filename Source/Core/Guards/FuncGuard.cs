@@ -3,7 +3,7 @@ using Proxoft.Redux.Core.Guards;
 
 namespace Proxoft.Redux.Core.Guards;
 
-public sealed class FuncGuard<TState>(Func<IAction, TState, IAction> guardFunc) : IGuard<TState>
+public sealed class FuncGuard<TState>(Func<IAction, TState, IAction> guardFunc) : IActionGuard<TState>
 {
     private readonly Func<IAction, TState, IAction> _guardFunc = guardFunc;
 

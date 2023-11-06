@@ -5,7 +5,7 @@ using Proxoft.Redux.Core.Guards;
 
 namespace ConsoleApp.Application;
 
-internal class ActionGuard : IGuard<ApplicationState>
+internal class ActionGuard : IActionGuard<ApplicationState>
 {
     public IAction Validate(IAction action, ApplicationState state)
     {

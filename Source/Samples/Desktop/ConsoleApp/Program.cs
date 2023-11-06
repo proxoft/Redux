@@ -55,14 +55,6 @@ class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
-        Store<ApplicationState> store = StoreHelper
-            .Create<ApplicationState>(
-                reducer: ApplicationReducer.Reduce,
-                guard: (a, s) => a,
-                effects: new ApplicationEffect()
-            )
-            ;
-
         var host = Host
             .CreateDefaultBuilder(args)
             .ConfigureServices(services =>

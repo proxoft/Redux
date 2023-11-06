@@ -15,7 +15,7 @@ namespace Proxoft.Redux.Core;
 public sealed class Store<T>(
     IActionDispatcher dispatcher,
     IReducer<T> reducer,
-    IGuard<T> guard,
+    IActionGuard<T> actionGuard,
     IStateStreamSubject<T> stateStreamSubject,
     IEnumerable<IEffect<T>> effects,
     IExceptionHandler exceptionHandler,
@@ -27,7 +27,7 @@ public sealed class Store<T>(
     private readonly IReducer<T> _reducer = reducer;
     private readonly IStateStreamSubject<T> _stateStreamSubject = stateStreamSubject;
     private readonly IEnumerable<IEffect<T>> _effects = effects.ToArray();
-    private readonly IGuard<T> _guard = guard;
+    private readonly IActionGuard<T> _actionGuard = actionGuard;
     private readonly IExceptionHandler _exceptionHandler = exceptionHandler;
     private readonly ILogger<Store<T>> _logger = logger;
 
@@ -53,7 +53,7 @@ public sealed class Store<T>(
                 new StateActionPair<T>(init, DefaultActions.None),
                 (acc, action) =>
                 {
-                    IAction guardedAction = _guard.Validate(action, acc.State);
+                    IAction guardedAction = _actionGuard.Validate(action, acc.State);
                     if(guardedAction != action)
                     {
                         _logger.LogDebug($"action {action} changed to {guardedAction}");
@@ -149,30 +149,29 @@ public static class StoreHelper
 
     public static Store<TState> Create<TState>(
         IReducer<TState> reducer,
-        Func<IAction, TState, IAction> guard,
+        Func<IAction, TState, IAction> actionGuard,
         IExceptionHandler? exceptionHandler = null,
         ILogger<Store<TState>>? logger = null,
         params IEffect<TState>[] effects)
     {
         return Create(
             reducer,
-            guard: new FuncGuard<TState>(guard),
+            actionGuard: new FuncGuard<TState>(actionGuard),
             exceptionHandler: exceptionHandler,
             logger: logger,
             effects: effects);
     }
 
-
     public static Store<TState> Create<TState>(
         Func<TState, IAction, TState> reducer,
-        Func<IAction, TState, IAction> guard,
+        Func<IAction, TState, IAction> actionGuard,
         IExceptionHandler? exceptionHandler = null,
         ILogger<Store<TState>>? logger = null,
         params IEffect<TState>[] effects)
     {
         return Create(
             new FuncReducer<TState>(reducer),
-            guard: new FuncGuard<TState>(guard),
+            actionGuard: new FuncGuard<TState>(actionGuard),
             exceptionHandler: exceptionHandler,
             logger: logger,
             effects: effects);
@@ -180,7 +179,7 @@ public static class StoreHelper
 
     public static Store<TState> Create<TState>(
         IReducer<TState> reducer,
-        IGuard<TState>? guard = null,
+        IActionGuard<TState>? actionGuard = null,
         IExceptionHandler? exceptionHandler = null,
         ILogger<Store<TState>>? logger = null,
         params IEffect<TState>[] effects)
@@ -191,7 +190,7 @@ public static class StoreHelper
         return new Store<TState>(
             dispatcher,
             reducer,
-            guard ?? new NoGuard<TState>(),
+            actionGuard ?? new NoGuard<TState>(),
             stateStreamSubject,
             effects,
             exceptionHandler ?? new ActionExceptionHandler(ex => throw ex),

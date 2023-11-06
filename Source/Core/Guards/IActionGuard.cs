@@ -1,6 +1,6 @@
 ﻿namespace Proxoft.Redux.Core.Guards;
 
-public interface IGuard<TState>
+public interface IActionGuard<TState>
 {
     /// <summary>
     /// Validates whether the dispatched action can be reduced.
