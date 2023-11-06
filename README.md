@@ -147,107 +147,109 @@ services.AddRedux<ApplicationState>(
 In some scenarios it might be useful to suppress actions that have been dispatched, for example repetitive dispatch of an action or concurrent state changes causing dispatched action to become invalid.
 
 ```csharp
+
 public record ApplicationState
-    {
-        public bool ProcessRunning { get; init; }
-        public string LastMessage { get; init; } = "";
+{
+    public bool ProcessRunning { get; init; }
+    public string LastMessage { get; init; } = "";
 }
 
-    public class StartProcessAction : IAction
-    {
-    }
+public class StartProcessAction : IAction
+{
+}
 
-    public class StopProcessAction : IAction
-    {
-    }
+public class StopProcessAction : IAction
+{
+}
 
-    public class WarningAction(string message) : IAction
-    {
-        public string Message { get; } = message;
-    }
+public class WarningAction(string message) : IAction
+{
+    public string Message { get; } = message;
+}
 
-    public static class ApplicationReducer
+public static class ApplicationReducer
+{
+    public static ApplicationState Reduce(ApplicationState state, IAction action)
     {
-        public static ApplicationState Reduce(ApplicationState state, IAction action)
+        return action switch
         {
-            return action switch
-            {
-                StartProcessAction => state with { ProcessRunning = true },
-                StopProcessAction => state with { ProcessRunning = false },
-                WarningAction a => state with { LastMessage = a.Message },
-                _ => state
-            };
-        }
+            StartProcessAction => state with { ProcessRunning = true },
+            StopProcessAction => state with { ProcessRunning = false },
+            WarningAction a => state with { LastMessage = a.Message },
+            _ => state
+        };
     }
+}
 
-    public class ExternProcessRunner
+public class ExternProcessRunner
+{
+    private bool _started;
+
+    public void Start()
     {
-        private bool _started;
-
-        public void Start()
+        if (_started)
         {
-            if (_started)
-            {
-                throw new Exception("cannot start");
-            }
-
-            _started = true;
+            throw new Exception("cannot start");
         }
 
-        public void Stop()
-        {
-            if (_started)
-            {
-                throw new Exception("cannot stop");
-            }
-
-            _started = false;
-        }
+        _started = true;
     }
 
-    public class ProcessEffect(ExternProcessRunner runner) : Effect<ApplicationState>
+    public void Stop()
     {
-        private readonly ExternProcessRunner _runner = runner;
-
-        private IObservable<Unit> OnStart => this.ActionStream
-                .OfType<StartProcessAction>()
-                .Do(_ => _runner.Start())
-                .SelectVoid()
-                ;
-
-        private IObservable<Unit> OnStop => this.ActionStream
-                .OfType<StopProcessAction>()
-                .Do(_ => _runner.Stop())
-                .SelectVoid()
-                ;
-    }
-
-    public static class ActionGuard
-    {
-        public static IAction Validate(IAction action, ApplicationState state)
+        if (_started)
         {
-            return action switch
-            {
-                StartProcessAction when state.ProcessRunning => new WarningAction("process already started"),
-                StopProcessAction when state.ProcessRunning == false => new WarningAction("process already stopped"),
-                _ => action
-            };
+            throw new Exception("cannot stop");
         }
+
+        _started = false;
     }
+}
 
-    // ...
+public class ProcessEffect(ExternProcessRunner runner) : Effect<ApplicationState>
+{
+    private readonly ExternProcessRunner _runner = runner;
 
-    Store<ApplicationState> store = StoreHelper.Create<ApplicationState>(
-        ApplicationReducer.Reduce,
-        ActionGuard.Validate,
-        effects: new ProcessEffect(new ExternProcessRunner())
-    );
+    private IObservable<Unit> OnStart => this.ActionStream
+            .OfType<StartProcessAction>()
+            .Do(_ => _runner.Start())
+            .SelectVoid()
+            ;
 
-    store.Initialize(new ApplicationState());
+    private IObservable<Unit> OnStop => this.ActionStream
+            .OfType<StopProcessAction>()
+            .Do(_ => _runner.Stop())
+            .SelectVoid()
+            ;
+}
 
-    store.Dispatcher.Dispatch(new StartProcessAction());
-    store.Dispatcher.Dispatch(new StartProcessAction()); // will be changed to WarningAction
+public static class ActionGuard
+{
+    public static IAction Validate(IAction action, ApplicationState state)
+    {
+        return action switch
+        {
+            StartProcessAction when state.ProcessRunning => new WarningAction("process already started"),
+            StopProcessAction when state.ProcessRunning == false => new WarningAction("process already stopped"),
+            _ => action
+        };
+    }
+}
 
-    store.Dispatcher.Dispatch(new StopProcessAction());
-    store.Dispatcher.Dispatch(new StopProcessAction());  // will be changed to WarningAction
+// ...
+
+Store<ApplicationState> store = StoreHelper.Create<ApplicationState>(
+    ApplicationReducer.Reduce,
+    ActionGuard.Validate,
+    effects: new ProcessEffect(new ExternProcessRunner())
+);
+
+store.Initialize(new ApplicationState());
+
+store.Dispatcher.Dispatch(new StartProcessAction());
+store.Dispatcher.Dispatch(new StartProcessAction()); // will be changed to WarningAction
+
+store.Dispatcher.Dispatch(new StopProcessAction());
+store.Dispatcher.Dispatch(new StopProcessAction());  // will be changed to WarningAction
+
 ```
