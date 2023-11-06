@@ -97,8 +97,6 @@ The Store\<TState> wires it all together. It
 Store store = StoreHelper.Create(ApplicationReducer.Reduce, effects: new ApplicationEffect());
 store.Initialize(new ApplicationState());
 
-store.Dispatchar.Dispatch(new TriggerAction());
-
 ```
 
 #### Use the store
