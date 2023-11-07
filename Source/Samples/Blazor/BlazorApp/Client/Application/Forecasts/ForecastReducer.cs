@@ -2,34 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using BlazorApp.Shared;
+using Proxoft.Redux.BlazorApp.Shared;
 using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application.Forecasts
+namespace Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
+
+public static class ForecastReducer
 {
-    public static class ForecastReducer
+    public static ForecastState Reduce(ForecastState state, IAction action)
     {
-        public static ForecastState Reduce(ForecastState state, IAction action)
+        return action switch
         {
-            return action switch
-            {
-                FetchWeatherForcastDataAction _ => state with { 
-                    Status = "Loading...", WeatherForecasts = Array.Empty<WeatherForecast>()
-                },
-                SetWeatherForecastAction sfa => SetData(state, sfa.WeatherForecasts),
-                _ => state
-            };
-        }
+            FetchWeatherForcastDataAction _ => state with { 
+                Status = "Loading...", WeatherForecasts = Array.Empty<WeatherForecast>()
+            },
+            SetWeatherForecastAction sfa => SetData(state, sfa.WeatherForecasts),
+            _ => state
+        };
+    }
 
-        private static ForecastState SetData(ForecastState state, IReadOnlyCollection<WeatherForecast> data)
+    private static ForecastState SetData(ForecastState state, IReadOnlyCollection<WeatherForecast> data)
+    {
+        var f = state with
         {
-            var f = state with
-            {
-                Status = "Loaded",
-                WeatherForecasts = data.ToArray()
-            };
+            Status = "Loaded",
+            WeatherForecasts = data.ToArray()
+        };
 
-            return f;
-        }
+        return f;
     }
 }

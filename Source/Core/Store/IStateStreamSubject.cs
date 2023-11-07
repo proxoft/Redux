@@ -1,7 +1,6 @@
-﻿namespace Proxoft.Redux.Core
+﻿namespace Proxoft.Redux.Core;
+
+public interface IStateStreamSubject<T> : IStateStream<T>
 {
-    public interface IStateStreamSubject<T> : IStateStream<T>
-    {
-        void OnNext(T state);
-    }
+    void OnNext(T state);
 }

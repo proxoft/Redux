@@ -1,16 +1,10 @@
 ﻿using System.Collections.Generic;
-using BlazorApp.Shared;
+using Proxoft.Redux.BlazorApp.Shared;
 using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application.Forecasts
-{
-    public class SetWeatherForecastAction : IAction
-    {
-        public SetWeatherForecastAction(IReadOnlyCollection<WeatherForecast> weatherForecasts)
-        {
-            this.WeatherForecasts = weatherForecasts;
-        }
+namespace Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
 
-        public IReadOnlyCollection<WeatherForecast> WeatherForecasts { get; }
-    }
+public class SetWeatherForecastAction(IReadOnlyCollection<WeatherForecast> weatherForecasts) : IAction
+{
+    public IReadOnlyCollection<WeatherForecast> WeatherForecasts { get; } = weatherForecasts;
 }

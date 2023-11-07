@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
+public class IgnoreSubscribeAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
-    public class IgnoreSubscribeAttribute : Attribute
-    {
-    }
 }

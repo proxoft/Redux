@@ -2,16 +2,12 @@
 
 namespace ConsoleApp.Application.Actions
 {
-    public class SetMessageAction : IAction
+    public class SetMessageAction(
+        string message,
+        string source = "") : IAction
     {
-        public SetMessageAction(string message, string source = "")
-        {
-            this.Message = message;
-            this.Source = source;
-        }
+        public string Message { get; } = message;
 
-        public string Message { get; }
-
-        public string Source { get; }
+        public string Source { get; } = source;
     }
 }

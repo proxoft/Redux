@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
-using BlazorApp.Client.Application;
-using BlazorApp.Client.Application.Forecasts;
-using BlazorApp.Shared;
+using Proxoft.Redux.BlazorApp.Client.Application;
+using Proxoft.Redux.BlazorApp.Client.Application.Forecasts;
+using Proxoft.Redux.BlazorApp.Shared;
 using Proxoft.Redux.Core.Tools;
 
-namespace BlazorApp.Client.Pages
+namespace Proxoft.Redux.BlazorApp.Client.Pages
 {
     public sealed partial class FetchData
     {

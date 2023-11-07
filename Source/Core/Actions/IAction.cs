@@ -1,6 +1,5 @@
-﻿namespace Proxoft.Redux.Core
+﻿namespace Proxoft.Redux.Core;
+
+public interface IAction
 {
-    public interface IAction
-    {
-    }
 }

@@ -1,7 +1,6 @@
-﻿namespace Proxoft.Redux.Core.Actions
+﻿namespace Proxoft.Redux.Core.Actions;
+
+public sealed class NoneAction : IAction
 {
-    public class NoneAction : IAction
-    {
-        internal NoneAction() { }
-    }
+    internal NoneAction() { }
 }

@@ -1,8 +1,7 @@
 ﻿using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application
+namespace Proxoft.Redux.BlazorApp.Client.Application;
+
+public abstract class BaseApplicationEffect : Effect<ApplicationState>
 {
-    public abstract class BaseApplicationEffect : Effect<ApplicationState>
-    {
-    }
 }

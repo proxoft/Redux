@@ -1,8 +1,7 @@
 ﻿using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application.Counters
+namespace Proxoft.Redux.BlazorApp.Client.Application.Counters;
+
+public class ResetCounterAction : IAction
 {
-    public class ResetCounterAction : IAction
-    {
-    }
 }

@@ -9,192 +9,191 @@ using Proxoft.Redux.Core.Effects;
 using Proxoft.Redux.Core.ExceptionHandling;
 using Proxoft.Redux.Core.Tools;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public abstract class Effect<TState> : IEffect<TState>
 {
-    public abstract class Effect<TState> : IEffect<TState>
+    private readonly SubscriptionsManager _subscriptionsManager = new SubscriptionsManager();
+    private readonly Subject<IAction> _actionsSubject = new Subject<IAction>();
+
+    public IObservable<IAction> OutActions => _actionsSubject;
+
+    protected IObservable<StateActionPair<TState>> StateActionStream { get; private set; } = Observable.Never<StateActionPair<TState>>();
+
+    protected IObservable<IAction> ActionStream => this.StateActionStream.Select(pair => pair.Action);
+
+    protected IObservable<TState> StateStream => this.StateActionStream.Select(pair => pair.State);
+
+    public void Connect(IObservable<StateActionPair<TState>> stateActionStream)
     {
-        private readonly SubscriptionsManager _subscriptionsManager = new SubscriptionsManager();
-        private readonly Subject<IAction> _actionsSubject = new Subject<IAction>();
+        this.StateActionStream = stateActionStream;
 
-        public IObservable<IAction> OutActions => _actionsSubject;
+        var subscriptions = this.AutoSubscribe()
+            .Concat(this.OnConnect())
+            .ToArray();
 
-        protected IObservable<StateActionPair<TState>> StateActionStream { get; private set; } = Observable.Never<StateActionPair<TState>>();
+        this.AddSubscriptions(subscriptions);
+    }
 
-        protected IObservable<IAction> ActionStream => this.StateActionStream.Select(pair => pair.Action);
+    public void Disconnect()
+    {
+        _subscriptionsManager.RemoveSubscriptions();
+        this.OnDisconnect();
+    }
 
-        protected IObservable<TState> StateStream => this.StateActionStream.Select(pair => pair.State);
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        public void Connect(IObservable<StateActionPair<TState>> stateActionStream)
-        {
-            this.StateActionStream = stateActionStream;
+    protected void Dispatch(IAction action)
+        => _actionsSubject.OnNext(action);
 
-            var subscriptions = this.AutoSubscribe()
-                .Concat(this.OnConnect())
-                .ToArray();
+    protected virtual IEnumerable<IDisposable> OnConnect()
+    {
+        return Array.Empty<IDisposable>();
+    }
 
-            this.AddSubscriptions(subscriptions);
-        }
+    protected virtual void OnDisconnect()
+    {
+    }
 
-        public void Disconnect()
-        {
-            _subscriptionsManager.RemoveSubscriptions();
-            this.OnDisconnect();
-        }
+    /// <summary>
+    /// Creates a subscription which dispatches the action(s) for all provided action streams.
+    /// </summary>
+    /// <param name="actionStreams">action streams</param>
+    /// <returns>Subscription instance.</returns>
+    [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
+    protected IDisposable SubscribeDispatch(params IObservable<IAction>[] actionStreams)
+    {
+        var subscription = actionStreams
+            .Merge()
+            .Subscribe(this.Dispatch);
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        return subscription;
+    }
 
-        protected void Dispatch(IAction action)
-            => _actionsSubject.OnNext(action);
+    protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction>[] actionStreams)
+    {
+        var subscription = actionStreams
+            .Select(x => x.Observable.Subscribe(
+                this.Dispatch,
+                exception => throw new ReduxException(x, exception))
+            );
 
-        protected virtual IEnumerable<IDisposable> OnConnect()
-        {
-            return Array.Empty<IDisposable>();
-        }
+        return subscription;
+    }
 
-        protected virtual void OnDisconnect()
-        {
-        }
+    /// <summary>
+    /// Creates a subscription which dispatches the action(s) for all provided action streams.
+    /// </summary>
+    /// <param name="actionStreams">action streams</param>
+    /// <returns>Subscription instance.</returns>
+    [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
+    protected IDisposable SubscribeDispatch(params IObservable<IAction[]>[] actionStreams)
+    {
+        var subscriptions = actionStreams
+            .Merge()
+            .Subscribe(actions =>
+            {
+                foreach (var action in actions)
+                {
+                    this.Dispatch(action);
+                }
+            });
 
-        /// <summary>
-        /// Creates a subscription which dispatches the action(s) for all provided action streams.
-        /// </summary>
-        /// <param name="actionStreams">action streams</param>
-        /// <returns>Subscription instance.</returns>
-        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
-        protected IDisposable SubscribeDispatch(params IObservable<IAction>[] actionStreams)
-        {
-            var subscription = actionStreams
-                .Merge()
-                .Subscribe(this.Dispatch);
+        return subscriptions;
+    }
 
-            return subscription;
-        }
-
-        protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction>[] actionStreams)
-        {
-            var subscription = actionStreams
-                .Select(x => x.Observable.Subscribe(
-                    this.Dispatch,
-                    exception => throw new ReduxException(x, exception))
-                );
-
-            return subscription;
-        }
-
-        /// <summary>
-        /// Creates a subscription which dispatches the action(s) for all provided action streams.
-        /// </summary>
-        /// <param name="actionStreams">action streams</param>
-        /// <returns>Subscription instance.</returns>
-        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
-        protected IDisposable SubscribeDispatch(params IObservable<IAction[]>[] actionStreams)
-        {
-            var subscriptions = actionStreams
-                .Merge()
-                .Subscribe(actions =>
+    protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction[]>[] actionStreams)
+    {
+        var subscriptions = actionStreams
+            .Select(x => x.Observable.Subscribe(
+                actions =>
                 {
                     foreach (var action in actions)
                     {
                         this.Dispatch(action);
                     }
-                });
+                },
+                exception => throw new ReduxException(x, exception))
+            );
 
-            return subscriptions;
-        }
+        return subscriptions;
+    }
 
-        protected IEnumerable<IDisposable> SubscribeDispatch(params Subscription<IAction[]>[] actionStreams)
+    /// <summary>
+    /// Creates a subscription for all observables which don't dispatch any action
+    /// </summary>
+    /// <param name="sources">Streams.</param>
+    /// <returns>Subscription instance.</returns>
+    [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
+    protected IDisposable SubscribeNoDispatch(params IObservable<Unit>[] sources)
+    {
+        var subscription = sources
+            .Merge()
+            .Subscribe();
+
+        return subscription;
+    }
+
+    protected IEnumerable<IDisposable> SubscribeNoDispatch(params Subscription<Unit>[] sources)
+    {
+        var subscription = sources
+            .Select(x => x.Observable.Subscribe(
+                unit => { },
+                exception => throw new ReduxException(x, exception))
+            );
+
+        return subscription;
+    }
+
+    protected void AddSubscriptions(params IDisposable[] subscriptions)
+        => _subscriptionsManager.AddSubscriptions(subscriptions);
+
+    public void RemoveSubscriptions(params IDisposable[] subscriptions)
+        => _subscriptionsManager.RemoveSubscriptions(subscriptions);
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing)
         {
-            var subscriptions = actionStreams
-                .Select(x => x.Observable.Subscribe(
-                    actions =>
-                    {
-                        foreach (var action in actions)
-                        {
-                            this.Dispatch(action);
-                        }
-                    },
-                    exception => throw new ReduxException(x, exception))
-                );
-
-            return subscriptions;
+            return;
         }
 
-        /// <summary>
-        /// Creates a subscription for all observables which don't dispatch any action
-        /// </summary>
-        /// <param name="sources">Streams.</param>
-        /// <returns>Subscription instance.</returns>
-        [Obsolete("Use the overload with Subscription parameter instead, it provides better exception handling")]
-        protected IDisposable SubscribeNoDispatch(params IObservable<Unit>[] sources)
-        {
-            var subscription = sources
-                .Merge()
-                .Subscribe();
+        _subscriptionsManager.Dispose();
+        _actionsSubject.Dispose();
+    }
 
-            return subscription;
-        }
+    private IDisposable[] AutoSubscribe()
+    {
+        var behavior = this.GetType().GetCustomAttribute<AutoSubscribeAttribute>() ?? new AutoSubscribeAttribute();
 
-        protected IEnumerable<IDisposable> SubscribeNoDispatch(params Subscription<Unit>[] sources)
-        {
-            var subscription = sources
-                .Select(x => x.Observable.Subscribe(
-                    unit => { },
-                    exception => throw new ReduxException(x, exception))
-                );
+        return this.SubscribeProperties(!behavior.Properties)
+            .Union(this.SubscribeMethods(!behavior.Methods))
+            .ToArray();
+    }
 
-            return subscription;
-        }
+    private IEnumerable<IDisposable> SubscribeProperties(bool optIn)
+    {
+        var voids = this.GetObservableProperties<Unit>(optIn).ToArray();
+        var actions = this.GetObservableProperties<IAction>(optIn).ToArray();
+        var arrayActions = this.GetObservableProperties<IAction[]>(optIn).ToArray();
 
-        protected void AddSubscriptions(params IDisposable[] subscriptions)
-            => _subscriptionsManager.AddSubscriptions(subscriptions);
+        return this.SubscribeNoDispatch(voids)
+            .Union(this.SubscribeDispatch(actions))
+            .Union(this.SubscribeDispatch(arrayActions));
+    }
 
-        public void RemoveSubscriptions(params IDisposable[] subscriptions)
-            => _subscriptionsManager.RemoveSubscriptions(subscriptions);
+    private IEnumerable<IDisposable> SubscribeMethods(bool optIn)
+    {
+        var voids = this.GetObservableMethods<Unit>(optIn).ToArray();
+        var actions = this.GetObservableMethods<IAction>(optIn).ToArray();
+        var arrayActions = this.GetObservableMethods<IAction[]>(optIn).ToArray();
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing)
-            {
-                return;
-            }
-
-            _subscriptionsManager.Dispose();
-            _actionsSubject.Dispose();
-        }
-
-        private IDisposable[] AutoSubscribe()
-        {
-            var behavior = this.GetType().GetCustomAttribute<AutoSubscribeAttribute>() ?? new AutoSubscribeAttribute();
-
-            return this.SubscribeProperties(!behavior.Properties)
-                .Union(this.SubscribeMethods(!behavior.Methods))
-                .ToArray();
-        }
-
-        private IEnumerable<IDisposable> SubscribeProperties(bool optIn)
-        {
-            var voids = this.GetObservableProperties<Unit>(optIn).ToArray();
-            var actions = this.GetObservableProperties<IAction>(optIn).ToArray();
-            var arrayActions = this.GetObservableProperties<IAction[]>(optIn).ToArray();
-
-            return this.SubscribeNoDispatch(voids)
-                .Union(this.SubscribeDispatch(actions))
-                .Union(this.SubscribeDispatch(arrayActions));
-        }
-
-        private IEnumerable<IDisposable> SubscribeMethods(bool optIn)
-        {
-            var voids = this.GetObservableMethods<Unit>(optIn).ToArray();
-            var actions = this.GetObservableMethods<IAction>(optIn).ToArray();
-            var arrayActions = this.GetObservableMethods<IAction[]>(optIn).ToArray();
-
-            return this.SubscribeNoDispatch(voids)
-                .Union(this.SubscribeDispatch(actions))
-                .Union(this.SubscribeDispatch(arrayActions));
-        }
+        return this.SubscribeNoDispatch(voids)
+            .Union(this.SubscribeDispatch(actions))
+            .Union(this.SubscribeDispatch(arrayActions));
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public interface IActionJournaler
 {
-    public interface IActionJournaler
-    {
-        void Journal(IAction action, Type? sender = null);
-    }
+    void Journal(IAction action, Type? sender = null);
 }

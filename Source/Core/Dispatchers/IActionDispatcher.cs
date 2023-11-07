@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public interface IActionDispatcher : IObservable<IAction>
 {
-    public interface IActionDispatcher : IObservable<IAction>
-    {
-        void Dispatch(IAction action, Type? sender = null);
-    }
+    void Dispatch(IAction action, Type? sender = null);
 }

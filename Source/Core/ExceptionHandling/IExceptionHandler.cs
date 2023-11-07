@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Proxoft.Redux.Core.ExceptionHandling
+namespace Proxoft.Redux.Core.ExceptionHandling;
+
+public interface IExceptionHandler
 {
-    public interface IExceptionHandler
-    {
-        void OnException(Exception exception);
-    }
+    void OnException(Exception exception);
 }

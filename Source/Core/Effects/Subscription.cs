@@ -3,31 +3,30 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reflection;
 
-namespace Proxoft.Redux.Core
+namespace Proxoft.Redux.Core;
+
+public class Subscription<T> : Subscription
 {
-    public class Subscription<T> : Subscription
+    public Subscription(MemberInfo memberInfo, IObservable<T> observable) : base(memberInfo)
     {
-        public Subscription(MemberInfo memberInfo, IObservable<T> observable) : base(memberInfo)
-        {
-            this.Observable = observable;
-        }
-
-        public IObservable<T> Observable { get; }
+        this.Observable = observable;
     }
 
-    public class Subscription
+    public IObservable<T> Observable { get; }
+}
+
+public class Subscription
+{
+    public Subscription(MemberInfo memberInfo)
     {
-        public Subscription(MemberInfo memberInfo)
-        {
-            this.PropertyName = memberInfo.Name;
-            this.ClassFullName = memberInfo.DeclaringType?.FullName ?? string.Empty;
-            this.ClassName = memberInfo.DeclaringType?.Name ?? string.Empty;
-        }
-
-        public string PropertyName { get; }
-
-        public string ClassName { get; }
-
-        public string ClassFullName { get; }
+        this.PropertyName = memberInfo.Name;
+        this.ClassFullName = memberInfo.DeclaringType?.FullName ?? string.Empty;
+        this.ClassName = memberInfo.DeclaringType?.Name ?? string.Empty;
     }
+
+    public string PropertyName { get; }
+
+    public string ClassName { get; }
+
+    public string ClassFullName { get; }
 }

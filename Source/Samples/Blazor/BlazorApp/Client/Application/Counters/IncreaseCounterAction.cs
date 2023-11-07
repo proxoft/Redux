@@ -1,14 +1,8 @@
 ﻿using Proxoft.Redux.Core;
 
-namespace BlazorApp.Client.Application.Counters
-{
-    public class IncreaseCounterAction : IAction
-    {
-        public IncreaseCounterAction(int byValue)
-        {
-            this.ByValue = byValue;
-        }
+namespace Proxoft.Redux.BlazorApp.Client.Application.Counters;
 
-        public int ByValue { get; }
-    }
+public class IncreaseCounterAction(int byValue) : IAction
+{
+    public int ByValue { get; } = byValue;
 }
