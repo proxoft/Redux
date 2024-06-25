@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -43,7 +40,7 @@ public sealed class Store<T>(
 
     public void Initialize(Func<T> initialState)
     {
-        var init = initialState();
+        T init = initialState();
 
         _stateStreamSubject.OnNext(init);
 
@@ -67,7 +64,6 @@ public sealed class Store<T>(
                     var state = _reducer.Reduce(acc.State, guardedAction);
                     return new StateActionPair<T>(state, guardedAction);
                 })
-            .DistinctUntilChanged()
             .Do(pair =>
             {
                 _stateStreamSubject.OnNext(pair.State);
@@ -91,7 +87,7 @@ public sealed class Store<T>(
 
         _dispatcher.Dispatch(DefaultActions.Initialize, this.GetType());
 
-        foreach (var e in _effects.OfType<IEffect<T>>())
+        foreach (IEffect<T> e in _effects.OfType<IEffect<T>>())
         {
             e.Connect(_effectStream);
         }
@@ -105,7 +101,7 @@ public sealed class Store<T>(
 
     public void Dispose()
     {
-        foreach (var e in _effects)
+        foreach (IEffect<T> e in _effects)
         {
             e.Disconnect();
         }

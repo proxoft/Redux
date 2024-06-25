@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reactive.Concurrency;
+using Microsoft.Extensions.DependencyInjection;
 using Proxoft.Redux.Core;
-using System;
-using System.Collections.Generic;
-using System.Reactive.Concurrency;
-using System.Text;
 
 namespace Proxoft.Redux.Hosting.Builders;
 
